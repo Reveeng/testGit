@@ -81,6 +81,7 @@ void GstVideoPlayer::setErr(QString err){
 
 void GstVideoPlayer::start(){
 //    QString launch = m_launchstring.replace("__URL__",m_url);
+    qDebug() << m_source;
     if (m_source == "")
     {
         setErr("Source cant be empty");

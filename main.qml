@@ -11,9 +11,11 @@ Window {
     title: qsTr("Hello World")
     GstVideoPlayer{
         id:myplayer
-        source: "gst-pipeline: "+
-                "rtspsrc location=rtsp://192.168.0.115/rawdata latency=0 !"+
-                "rtpvrawdepay ! queue ! qtvideosink"
+        source: "playbin uri=https://www.freedesktop.org/software/gstreamer-sdk/data/media/sintel_trailer-480p.webm";
+
+        onErrChanged: {
+            console.log(err)
+        }
     }
     VideoOutput{
         id:output

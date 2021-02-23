@@ -23,29 +23,27 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32: LIBS += -L$$PWD/lib/
-
-win32: LIBS += -lgstreamer-1.0
-win32: LIBS += -L$$PWD/lib/ -lglib-2.0
-win32: LIBS += -L$$PWD/lib/ -lgio-2.0
-win32: LIBS += -L$$PWD/lib/ -lgstapp-1.0
-win32: LIBS += -L$$PWD/lib/ -lgstbase-1.0
+win32: LIBS += $$PWD/lib/libgio-2.0-0.dll
+win32: LIBS += $$PWD/lib/libgstapp-1.0-0.dll
+win32: LIBS += $$PWD/lib/libgstbase-1.0-0.dll
+win32: LIBS += $$PWD/lib/libgstreamer-1.0-0.dll
+win32: LIBS += $$PWD/lib/libgobject-2.0-0.dll
+win32: LIBS += $$PWD/lib/libglib-2.0-0.dll
 
 
 HEADERS += \
     gstvideoplayer.h
 
-INCLUDEPATH += $$PWD/include
-INCLUDEPATH += $$PWD/include/gstreamer-1.0
-INCLUDEPATH += $$PWD/include/glib-2.0
-INCLUDEPATH += $$PWD/include/glib-2.0/gio
-INCLUDEPATH += $$PWD/include/glib-2.0/glib
-INCLUDEPATH += $$PWD/include/glib-2.0/gobject
+INCLUDEPATH += $$PWD/gstreamer-1.0
+INCLUDEPATH += $$PWD/glib-2.0
+INCLUDEPATH += $$PWD/glib-2.0/gobject
+INCLUDEPATH += $$PWD/glib-2.0/glib
+INCLUDEPATH += $$PWD/glib-2.0/gio
 
-DEPENDPATH +=$$PWD/include
-DEPENDPATH +=$$PWD/include/gstreamer-1.0
-DEPENDPATH +=$$PWD/include/glib-2.0
-DEPENDPATH += $$PWD/include/glib-2.0/gio
-DEPENDPATH += $$PWD/include/glib-2.0/glib
-DEPENDPATH += $$PWD/include/glib-2.0/gobject
+DEPENDPATH +=$$PWD/gstreamer-1.0
+DEPENDPATH +=$$PWD/glib-2.0
+DEPENDPATH +=$$PWD/glib-2.0/gobject
+DEPENDPATH +=$$PWD/glib-2.0/glib
+DEPENDPATH +=$$PWD/glib-2.0/gio
 
+GST_DEBUG = 3

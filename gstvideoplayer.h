@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QAbstractVideoSurface>
 
-
 class GstVideoPlayer : public QObject
 {
     Q_OBJECT
