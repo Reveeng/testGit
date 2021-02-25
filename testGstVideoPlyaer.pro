@@ -25,11 +25,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 win32: LIBS += -L$$PWD/lib/
 
-win32: LIBS += -lgstreamer-1.0
-win32: LIBS += -L$$PWD/lib/ -lglib-2.0
-win32: LIBS += -L$$PWD/lib/ -lgio-2.0
-win32: LIBS += -L$$PWD/lib/ -lgstapp-1.0
-win32: LIBS += -L$$PWD/lib/ -lgstbase-1.0
+LIBS += -llibgio-2.0-0 -llibgstapp-1.0-0 -llibgstbase-1.0-0 -llibgstreamer-1.0-0 -llibgobject-2.0-0 -llibglib-2.0-0
 
 
 HEADERS += \
@@ -41,6 +37,7 @@ INCLUDEPATH += $$PWD/include/glib-2.0
 INCLUDEPATH += $$PWD/include/glib-2.0/gio
 INCLUDEPATH += $$PWD/include/glib-2.0/glib
 INCLUDEPATH += $$PWD/include/glib-2.0/gobject
+INCLUDEPATH += $$PWD/include/gio-win32-2.0
 
 DEPENDPATH +=$$PWD/include
 DEPENDPATH +=$$PWD/include/gstreamer-1.0
@@ -48,4 +45,5 @@ DEPENDPATH +=$$PWD/include/glib-2.0
 DEPENDPATH += $$PWD/include/glib-2.0/gio
 DEPENDPATH += $$PWD/include/glib-2.0/glib
 DEPENDPATH += $$PWD/include/glib-2.0/gobject
+DEPENDPATH += $$PWD/include/gio-win32-2.0
 

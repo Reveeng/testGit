@@ -17,15 +17,15 @@ static GstFlowReturn OnAppsinkNewFrame(GstElement *sink, GstVideoPlayer *videopl
 }
 
 GstVideoPlayer::GstVideoPlayer(QObject * parent) : QObject(parent),
+    m_videoSurface(0),
     m_source(""),
     m_pipeline(nullptr),
     m_appsink(nullptr),
     m_sinkName("sink0")
+
 {
     gst_init(NULL, NULL);
-    m_launchstring = "rtspsrc location=__URL__ latency=0 ! "
-                     "rtpvrawdepay ! queue ! "
-                     "appsink max-buffers=3 drop=true emit-signals=true name="+m_sinkName;
+    connect(this, &GstVideoPlayer::newFrame, this, &GstVideoPlayer::updateFrame);
 }
 GstVideoPlayer::~GstVideoPlayer(){
     closeSurface();
@@ -38,19 +38,19 @@ void GstVideoPlayer::registerQmlType()
             "GstVideoPlayer" );
 }
 
-void GstVideoPlayer::setSurface (QAbstractVideoSurface *surface){
-    if (m_surface)
+void GstVideoPlayer::setVideoSurface (QAbstractVideoSurface *surface){
+    if (m_videoSurface)
         closeSurface();
-    m_surface = surface;
+    m_videoSurface = surface;
 }
 
 void GstVideoPlayer::closeSurface(){
-    if (m_surface && m_surface->isActive())
-        m_surface->stop();
+    if (m_videoSurface && m_videoSurface->isActive())
+        m_videoSurface->stop();
 }
 
-QAbstractVideoSurface* GstVideoPlayer::surface() const{
-    return m_surface;
+QAbstractVideoSurface* GstVideoPlayer::videoSurface() const{
+    return m_videoSurface;
 }
 
 QString GstVideoPlayer::source() const{
@@ -87,18 +87,23 @@ void GstVideoPlayer::start(){
         return;
     }
     m_pipeline = gst_parse_launch(qPrintable(m_source),NULL);
-    m_appsink = gst_bin_get_by_name(GST_BIN(m_pipeline), qPrintable(m_sinkName));
 
     if (!m_pipeline){
         setErr("Failed to start pipeline");
         return;
     }
+
+    m_appsink = gst_bin_get_by_name(GST_BIN(m_pipeline), qPrintable(m_sinkName));
+
+
     if (!m_appsink){
         setErr("Failed to get appsrc");
         return;
     }
 
     GstStateChangeReturn res = gst_element_set_state(GST_ELEMENT(m_pipeline), GST_STATE_PLAYING);
+    g_signal_connect (m_appsink, "new-sample", G_CALLBACK (OnAppsinkNewFrame), this);
+    g_signal_connect (m_appsink, "eos", G_CALLBACK (OnAppsinkEOS), this);
     if (res == GST_STATE_CHANGE_FAILURE)
     {
         setErr("Unable to set the pipeline to the playing state");
@@ -128,8 +133,14 @@ void GstVideoPlayer::stop(){
 int GstVideoPlayer::pullAppsinkFrame(){
     GstSample *sample;
     GstBuffer *buf;
-    GstMapInfo *info;
-//    QSize size;
+    GstMapInfo info;
+    QSize size;
+    bool ok;
+    QVideoFrame frame;
+
+//    if (!m_videoSurface)
+//        return 0;
+
     /* Retrieve the buffer */
     g_signal_emit_by_name (m_appsink, "pull-sample", &sample);
     if (! sample) {
@@ -137,48 +148,57 @@ int GstVideoPlayer::pullAppsinkFrame(){
         return GST_FLOW_ERROR;
     }
     GstCaps * caps = gst_sample_get_caps(sample);
-    guint capsize = gst_caps_get_size(caps);
     gchar *StringCaps = gst_caps_to_string(caps);
-    qDebug() << StringCaps;
-    qDebug() << capsize;
-//    for (guint i = 0; i < capsize; i++){
-//        GstStructure * oneStruct = gst_caps_get_structure(caps,i);
-//        QString structureName = QString(gst_structure_get_name(oneStruct));
-//        if (structureName == "width" ){
-//            const GValue * gwidth = gst_structure_get_value(oneStruct,"width");
-//            size.setWidth(*(int*) gwidth);
-//        }
-//        if (structureName == "height"){
-//            const GValue * gheight = gst_structure_get_value(oneStruct,"height");
-//            size.setHeight(* (int *) gheight);
-//        }
-//    }
+//    qDebug() << StringCaps;
+    QString QstringCaps = QString(StringCaps);
+    QStringList  QCaps = QstringCaps.split(QLatin1Char(' '));
+    for (int i = 0; i < QCaps.length(); i++){
+        if (QCaps[i].startsWith("width")){
+            size.setWidth((QCaps[i].split(QLatin1Char(')'))[1].remove(-1,1)).toInt(&ok, 10));
+        }
+        if (QCaps[i].startsWith("height")){
+            size.setHeight((QCaps[i].split(QLatin1Char(')'))[1].remove(-1,1)).toInt(&ok,10));
+        }
+    }
+
+    if (size.height() != m_format.frameSize().height() || size.width() != m_format.frameSize().width()){
+        closeSurface();
+        m_format = QVideoSurfaceFormat(size, QVideoFrame::Format_UYVY);
+        m_videoSurface->start(m_format);
+    }
+
+    frame = QVideoFrame(size.height()*size.width()*2,size,size.width()*2,QVideoFrame::Format_UYVY);
     buf = gst_sample_get_buffer(sample);
-    gst_buffer_map(buf,info, GST_MAP_READ);
-//    bool isMapped = frame->map(QAbstractVideoBuffer::ReadWrite);
-//    if (!isMapped){
-//        setErr("Unable to map QVideoFrame");
-//        return GST_FLOW_ERROR;
-//    }
-//    uchar *frameBuf = frame->bits();
+    if (!buf){
+        setErr("Unable to get buffer");
+        return GST_FLOW_ERROR;
+    }
+    gst_buffer_map(buf,&info, GST_MAP_READ);
+    frame.map(QAbstractVideoBuffer::ReadWrite);
+    if (!frame.isMapped()){
+        setErr("Unable to map QVideoFrame");
+        return GST_FLOW_ERROR;
+    }
+    uchar *frameBuf = frame.bits();
 
     /* Get mapped data*/
-    signed short *dataptr = (signed short *) info->data;
-//    memccpy(frameBuf,dataptr,info->size);
+    guint8 *dataptr = info.data;
+//    qDebug() << info.size;
+    memcpy(frameBuf,dataptr,info.size);
     /*Procces mapped data*/
 
 //    setLastTimestamp(GST_BUFFER_TIMESTAMP(buf));
-//    emit newFrame();
-//    bool isPresented = m_surface->present(*frame);
-//    if (!isPresented){
-//        setErr("Unable to present frame in surface");
-//        frame->unmap();
-//        gst_buffer_unmap(buf,info);
-//        gst_sample_unref(sample);
-//        return GST_FLOW_ERROR;
-//    }
-//    frame->unmap();
-    gst_buffer_unmap(buf,info);
+    emit newFrame(frame);
+    frame.unmap();
+    gst_buffer_unmap(buf,&info);
     gst_sample_unref (sample);
     return GST_FLOW_OK;
 }
+
+void GstVideoPlayer::updateFrame(QVideoFrame frame){
+    bool isPresented = m_videoSurface->present(frame);
+    if (!isPresented){
+        setErr("Unable to present frame in surface");
+    }
+}
+

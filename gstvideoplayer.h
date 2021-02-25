@@ -4,13 +4,14 @@
 #include <gst/gst.h>
 #include <QObject>
 #include <QAbstractVideoSurface>
+#include <QVideoSurfaceFormat>
 
 
 class GstVideoPlayer : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QAbstractVideoSurface * surface READ surface WRITE setSurface)
+    Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface)
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(QString err READ err WRITE setErr NOTIFY errChanged)
 
@@ -21,7 +22,7 @@ public:
 
     static void registerQmlType();
 
-    QAbstractVideoSurface * surface() const;
+    QAbstractVideoSurface * videoSurface() const;
 
     QString source() const;
 
@@ -29,7 +30,7 @@ public:
 
     int pullAppsinkFrame();
 public slots:
-    void setSurface(QAbstractVideoSurface * surface);
+    void setVideoSurface(QAbstractVideoSurface * surface);
 
     void setSource(QString url);
 
@@ -37,6 +38,7 @@ public slots:
 
     void stop();
 
+    void updateFrame(QVideoFrame frame);
 
     void setErr(QString err);
 
@@ -44,14 +46,15 @@ signals:
     void sourceChanged(QString url);
     void started();
     void stopped();
-    void newFrame();
+    void newFrame(QVideoFrame frame);
     void errChanged(QString err);
 
 private:
     void closeSurface();
 
 private:
-    QAbstractVideoSurface * m_surface;
+    QAbstractVideoSurface * m_videoSurface;
+    QVideoSurfaceFormat  m_format;
     QString m_source;
 
     QString m_err;

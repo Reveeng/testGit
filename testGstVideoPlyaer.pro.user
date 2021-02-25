@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.13.3, 2021-02-19T13:10:54. -->
+<!-- Written by QtCreator 4.13.3, 2021-02-25T15:20:59. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -138,7 +138,12 @@
     <value type="int" key="ProjectExplorer.BuildConfiguration.BuildStepListCount">2</value>
     <value type="bool" key="ProjectExplorer.BuildConfiguration.ClearSystemEnvironment">false</value>
     <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.CustomParsers"/>
-    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges"/>
+    <valuelist type="QVariantList" key="ProjectExplorer.BuildConfiguration.UserEnvironmentChanges">
+     <value type="QString">GST_DEBUG=1</value>
+     <value type="QString">GST_PLUGIN_PATH=C:\testProjects\testDebug\debug\gstplugins</value>
+     <value type="QString">&lt;переменная&gt;=&lt;значение&gt;</value>
+     <value type="QString">Path=C:\Qt\Tools\mingw730_32\bin;C:\Qt\5.15.2\mingw73_32\bin;C:\Qt\Tools\mingw730_32\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Strawberry\c\bin;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Program Files\PuTTY\;C:\Program Files (x86)\Git\cmd;C:\Program Files\VisualSVN Server\bin;C:\Program Files\TortoiseSVN\bin;C:\Users\Егор\AppData\Local\Programs\Python\Python39\Scripts\;C:\Users\Егор\AppData\Local\Programs\Python\Python39\;C:\python\Scripts\;C:\python\;C:\Users\Егор\AppData\Local\Microsoft\WindowsApps;C:\Cmake\bin;C:\Qt\Tools\mingw730_32\bin;C:\Qt\5.15.2\mingw73_32\bin;C:\gstreamer\1.0\mingw_x86\bin;</value>
+    </valuelist>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Отладка</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4BuildConfiguration</value>
     <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">2</value>

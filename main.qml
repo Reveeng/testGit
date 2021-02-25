@@ -11,9 +11,12 @@ Window {
     title: qsTr("Hello World")
     GstVideoPlayer{
         id:myplayer
-        source: "gst-pipeline: "+
-                "rtspsrc location=rtsp://192.168.0.115/rawdata latency=0 !"+
-                "rtpvrawdepay ! queue ! qtvideosink"
+        source: "rtspsrc location=rtsp://192.168.0.115/rawdata latency=0 ! "+
+        "rtpvrawdepay ! queue ! "+
+        "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
+        onErrChanged: {
+            console.log(err)
+        }
     }
     VideoOutput{
         id:output
@@ -22,6 +25,7 @@ Window {
         width:640
         height:480
         source: myplayer
+        anchors.fill: parent
     }
     Button{
         x: 650
