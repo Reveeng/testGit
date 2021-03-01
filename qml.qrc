@@ -1,5 +1,12 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>RightPanel.qml</file>
+        <file>VideoPage.qml</file>
+        <file>RectOnScreen.qml</file>
+        <file>BlackBodyIndicator.qml</file>
+        <file>dotsleft.png</file>
+        <file>dotsright.png</file>
+        <file>BBItem.qml</file>
     </qresource>
 </RCC>

@@ -80,7 +80,6 @@ void GstVideoPlayer::setErr(QString err){
 }
 
 void GstVideoPlayer::start(){
-//    QString launch = m_launchstring.replace("__URL__",m_url);
     if (m_source == "")
     {
         setErr("Source cant be empty");
@@ -138,8 +137,6 @@ int GstVideoPlayer::pullAppsinkFrame(){
     bool ok;
     QVideoFrame frame;
 
-//    if (!m_videoSurface)
-//        return 0;
 
     /* Retrieve the buffer */
     g_signal_emit_by_name (m_appsink, "pull-sample", &sample);
@@ -149,7 +146,6 @@ int GstVideoPlayer::pullAppsinkFrame(){
     }
     GstCaps * caps = gst_sample_get_caps(sample);
     gchar *StringCaps = gst_caps_to_string(caps);
-//    qDebug() << StringCaps;
     QString QstringCaps = QString(StringCaps);
     QStringList  QCaps = QstringCaps.split(QLatin1Char(' '));
     for (int i = 0; i < QCaps.length(); i++){

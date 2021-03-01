@@ -47,3 +47,5 @@ DEPENDPATH += $$PWD/include/glib-2.0/glib
 DEPENDPATH += $$PWD/include/glib-2.0/gobject
 DEPENDPATH += $$PWD/include/gio-win32-2.0
 
+DISTFILES +=
+
