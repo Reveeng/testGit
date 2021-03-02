@@ -21,14 +21,19 @@ GstVideoPlayer::GstVideoPlayer(QObject * parent) : QObject(parent),
     m_source(""),
     m_pipeline(nullptr),
     m_appsink(nullptr),
-    m_sinkName("sink0")
+    m_sinkName("sink0"),
+    m_fps(0),
+    m_lastTimestamp(0)
 
 {
     gst_init(NULL, NULL);
+    m_deconv = new Deconv;
+    m_deconv->setFftSize(1024);
     connect(this, &GstVideoPlayer::newFrame, this, &GstVideoPlayer::updateFrame);
 }
 GstVideoPlayer::~GstVideoPlayer(){
     closeSurface();
+    delete m_deconv;
 }
 
 void GstVideoPlayer::registerQmlType()
@@ -51,6 +56,17 @@ void GstVideoPlayer::closeSurface(){
 
 QAbstractVideoSurface* GstVideoPlayer::videoSurface() const{
     return m_videoSurface;
+}
+
+int GstVideoPlayer::fps() const{
+    return m_fps;
+}
+
+void GstVideoPlayer::setFps(int fps){
+    if (fps == m_fps)
+        return;
+    m_fps = fps;
+    emit fpsChanged(m_fps);
 }
 
 QString GstVideoPlayer::source() const{
@@ -169,6 +185,7 @@ int GstVideoPlayer::pullAppsinkFrame(){
         setErr("Unable to get buffer");
         return GST_FLOW_ERROR;
     }
+    setLastTimestamp(GST_BUFFER_TIMESTAMP(buf));
     gst_buffer_map(buf,&info, GST_MAP_READ);
     frame.map(QAbstractVideoBuffer::ReadWrite);
     if (!frame.isMapped()){
@@ -182,8 +199,9 @@ int GstVideoPlayer::pullAppsinkFrame(){
 //    qDebug() << info.size;
     memcpy(frameBuf,dataptr,info.size);
     /*Procces mapped data*/
-
-//    setLastTimestamp(GST_BUFFER_TIMESTAMP(buf));
+    copyToDeconv((int16_t *)frameBuf, size.width(),size.height());
+    m_deconv->calculate();
+    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
     emit newFrame(frame);
     frame.unmap();
     gst_buffer_unmap(buf,&info);
@@ -196,5 +214,41 @@ void GstVideoPlayer::updateFrame(QVideoFrame frame){
     if (!isPresented){
         setErr("Unable to present frame in surface");
     }
+}
+
+void GstVideoPlayer::setLastTimestamp(ulong timestamp){
+    if (timestamp == m_lastTimestamp)
+        return;
+    m_fps = 1000000000/(timestamp - m_lastTimestamp);
+    m_lastTimestamp = timestamp;
+    emit fpsChanged(m_fps);
+}
+
+void GstVideoPlayer::copyToDeconv(int16_t * buf,int width, int height){
+    float    *pFft = m_deconv->fftInputBuffer();
+    pFft +=  m_deconv->fftDataOffset() + (m_deconv->fftSize()*m_deconv->fftDataOffset());
+
+    for (int y=0; y < height; y++) {
+        for (int x=0; x < width; x++) {
+            pFft[x] = buf[x] * 1.0;
+        }
+        buf += width;
+        pFft += m_deconv->fftSize();
+    }
+
+}
+
+void GstVideoPlayer::copyFromDeconv(int16_t * buf, int width, int height){
+    float coef = m_deconv->fftSize() * m_deconv->fftSize();
+    float    *pFft = m_deconv->fftOutputBuffer();
+
+    for (int y=0; y < height; y++) {
+        for (int x=0; x < width; x++) {
+            buf[x] = (int16_t)( pFft[x] / coef );
+        }
+        buf += width;
+        pFft += m_deconv->fftSize();
+    }
+
 }
 

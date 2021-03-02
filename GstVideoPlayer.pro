@@ -8,7 +8,7 @@ CONFIG += c++11
 
 SOURCES += \
         gstvideoplayer.cpp \
-        main.cpp
+        main.cpp \
 
 RESOURCES += qml.qrc
 
@@ -29,7 +29,8 @@ LIBS += -llibgio-2.0-0 -llibgstapp-1.0-0 -llibgstbase-1.0-0 -llibgstreamer-1.0-0
 
 
 HEADERS += \
-    gstvideoplayer.h
+    gstvideoplayer.h \
+
 
 INCLUDEPATH += $$PWD/include
 INCLUDEPATH += $$PWD/include/gstreamer-1.0
@@ -48,4 +49,8 @@ DEPENDPATH += $$PWD/include/glib-2.0/gobject
 DEPENDPATH += $$PWD/include/gio-win32-2.0
 
 DISTFILES +=
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../deconv-fft-lib/release/ -ldeconv-fft-lib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../deconv-fft-lib/debug/ -ldeconv-fft-lib
 

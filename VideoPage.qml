@@ -85,6 +85,9 @@ Item{
          onErrChanged: {
              console.log(err)
          }
+         onFpsChanged: {
+             console.log(fps)
+         }
      }
      VideoOutput{
          id:output

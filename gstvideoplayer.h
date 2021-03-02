@@ -5,12 +5,15 @@
 #include <QObject>
 #include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
+#include "../deconv-fft-lib/deconv.h"
+#include "../tfm-contraster-lib/tfmcontraster.h"
 
 
 class GstVideoPlayer : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(int fps READ fps WRITE setFps NOTIFY fpsChanged)
     Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface)
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(QString err READ err WRITE setErr NOTIFY errChanged)
@@ -22,6 +25,8 @@ public:
 
     static void registerQmlType();
 
+    int fps() const;
+
     QAbstractVideoSurface * videoSurface() const;
 
     QString source() const;
@@ -30,6 +35,8 @@ public:
 
     int pullAppsinkFrame();
 public slots:
+    void setFps(int fps);
+
     void setVideoSurface(QAbstractVideoSurface * surface);
 
     void setSource(QString url);
@@ -42,21 +49,27 @@ public slots:
 
     void setErr(QString err);
 
+protected slots:
+    void setLastTimestamp(ulong timestamp);
+
 signals:
     void sourceChanged(QString url);
     void started();
     void stopped();
     void newFrame(QVideoFrame frame);
     void errChanged(QString err);
+    void fpsChanged(int fps);
 
-private:
+private slots:
     void closeSurface();
+    void copyToDeconv(int16_t * buf, int width, int height);
+    void copyFromDeconv(int16_t * buf, int width, int heigt);
 
 private:
     QAbstractVideoSurface * m_videoSurface;
     QVideoSurfaceFormat  m_format;
     QString m_source;
-
+    Deconv * m_deconv;
     QString m_err;
 
 protected:
@@ -64,6 +77,8 @@ protected:
     GstElement * m_appsink;
     QString m_launchstring;
     QString m_sinkName;
+    int m_fps;
+    ulong m_lastTimestamp;
 };
 
 
