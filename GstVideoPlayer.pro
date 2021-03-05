@@ -9,6 +9,7 @@ CONFIG += c++11
 SOURCES += \
         gstvideoplayer.cpp \
         main.cpp \
+    onvif.cpp
 
 RESOURCES += qml.qrc
 
@@ -30,6 +31,7 @@ LIBS += -llibgio-2.0-0 -llibgstapp-1.0-0 -llibgstbase-1.0-0 -llibgstreamer-1.0-0
 
 HEADERS += \
     gstvideoplayer.h \
+    onvif.h
 
 
 INCLUDEPATH += $$PWD/include
@@ -54,3 +56,15 @@ DISTFILES +=
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../deconv-fft-lib/release/ -ldeconv-fft-lib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../deconv-fft-lib/debug/ -ldeconv-fft-lib
 
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../tfm-contraster-lib/release/ -ltfm-contraster-lib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../tfm-contraster-lib/debug/ -ltfm-contraster-lib
+
+INCLUDEPATH += $$PWD/../tfm-contraster-lib
+DEPENDPATH += $$PWD/../tfm-contraster-lib
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../tfm-temperature-lib/release/ -ltfm-temperature-lib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../tfm-temperature-lib/debug/ -ltfm-temperature-lib
+
+INCLUDEPATH += $$PWD/../tfm-temperature-lib
+DEPENDPATH += $$PWD/../tfm-temperature-lib

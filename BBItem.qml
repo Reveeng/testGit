@@ -156,6 +156,10 @@ Item {
         height: 23
         focusPolicy: Qt.NoFocus
     }
+    function getRefPoint(){
+        var bb = [parseInt(textX.text,10), parseInt(textY.text, 10),parseFloat(tempField.text,10)]
+        return bb
+    }
 }
 
 

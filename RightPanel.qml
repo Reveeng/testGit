@@ -5,8 +5,6 @@ import QtQuick.Layouts 1.3
 
 Rectangle{
      //properties
-     property var fbb: [bb1.textX,bb1.textY,bb1.temp,bb1.macCB.currentText]
-     property var sbb: [bb2.textX,bb2.textY,bb2.temp,bb2.macCB.currentText]
 
      //alias properties
      property alias textX1: bb1.textX
@@ -21,6 +19,7 @@ Rectangle{
      color: "#2d2d2d"
 
      //signals
+     signal start()
      signal setBlackBody1(int x, int y)
      signal setBlackBody2(int x, int y)
      signal hasTwoBB()
@@ -28,14 +27,9 @@ Rectangle{
      signal showBlackbody()
      signal saveImagePressed()
      signal settingMode(bool mode)
+     signal setRefPoints(var point1, var point2)
 
      //proccesing signals
-     onFbbChanged: {
-        console.log(fbb)
-     }
-     onSbbChanged: {
-        console.log(sbb)
-     }
 
     //two tab view
      StackLayout{
@@ -81,53 +75,53 @@ Rectangle{
                  }
              }
 
-             CheckBox {
-                 id:checkbox
-                 x: 176
-                 y: 0
-                 width: 24
-                 height: 20
-                 text: qsTr("Check Box")
-                 indicator.width:10
-                 indicator.height: 10
-                 focusPolicy: Qt.NoFocus
-                 nextCheckState: {
-                    if (checkState === Qt.Checked){
+//             CheckBox {
+//                 id:checkbox
+//                 x: 176
+//                 y: 0
+//                 width: 24
+//                 height: 20
+//                 text: qsTr("Check Box")
+//                 indicator.width:10
+//                 indicator.height: 10
+//                 focusPolicy: Qt.NoFocus
+//                 nextCheckState: {
+//                    if (checkState === Qt.Checked){
 //                        showBlackbody()
-                        snapshot.modeOneBB = false
-                        bb2.visible = true
-                        settingbuttons.vis =  true
-                        settingbuttons.anchors.top = bb2.bottom
-                        settingbuttons.state = "2blackBody"
-                    }
-                    else{
-                        snapshot.modeOneBB = true
-                        bb2.visible = false
-                        hideBlackbody2()
-                        settingbuttons.vis = false
-                        settingbuttons.anchors.top = bb1.bottom
-                        settingbuttons.state = "1blackBody"
-                    }
-                 }
-             }
+//                        snapshot.modeOneBB = false
+//                        bb2.visible = true
+//                        settingbuttons.vis =  true
+//                        settingbuttons.anchors.top = bb2.bottom
+//                        settingbuttons.state = "2blackBody"
+//                    }
+//                    else{
+//                        snapshot.modeOneBB = true
+//                        bb2.visible = false
+//                        hideBlackbody2()
+//                        settingbuttons.vis = false
+//                        settingbuttons.anchors.top = bb1.bottom
+//                        settingbuttons.state = "1blackBody"
+//                    }
+//                 }
+//             }
 
-             Text {
-                 id:twobbtext
-                 x: 131
-                 y: 0
-                 anchors.verticalCenter: checkbox.verticalCenter
-                 height: 12
-                 text: qsTr("Два АЧТ")
-                 color:"white"
-                 font.pixelSize: 10
-                 anchors.rightMargin: -1
-             }
+//             Text {
+//                 id:twobbtext
+//                 x: 131
+//                 y: 0
+//                 anchors.verticalCenter: checkbox.verticalCenter
+//                 height: 12
+//                 text: qsTr("Два АЧТ")
+//                 color:"white"
+//                 font.pixelSize: 10
+//                 anchors.rightMargin: -1
+//             }
 
              BBItem{
                  id:bb1
                  y: 54
                  index:1
-                 anchors.top: checkbox.bottom
+                 anchors.top: parent.top
                  anchors.topMargin: 5
                  Component.onCompleted: setBlackBody.connect(setBlackBody1)
              }
@@ -135,7 +129,6 @@ Rectangle{
              BBItem{
                 id:bb2
                 y: 135
-                visible: false
                 anchors.top: bb1.bottom
                 anchors.topMargin: 3
                 index: 2
@@ -165,19 +158,43 @@ Rectangle{
 //                 }
 //             }
 
-             Rectangle {
-                 id: rpdivider
-                 x: 2
-                 y: 153
-                 height: 3
-                 color: "#666666"
-                 anchors.left: parent.left
-                 anchors.right: parent.right
-                 anchors.top: settingbuttons.bottom
-                 anchors.topMargin: 10
-                 anchors.leftMargin: 0
-                 anchors.rightMargin: 0
-             }
+//             Rectangle {
+//                 id: rpdivider
+//                 x: 2
+//                 y: 153
+//                 height: 3
+//                 color: "#666666"
+//                 anchors.left: parent.left
+//                 anchors.right: parent.right
+//                 anchors.top: bb2.bottom
+//                 anchors.topMargin: 10
+//                 anchors.leftMargin: 0
+//                 anchors.rightMargin: 0
+//             }
+
+            Button{
+                id:setRefPointsBtn
+                text:"Установить опорные точки"
+                anchors.left:parent.left
+                anchors.right: parent.right
+                anchors.top: bb2.bottom
+                anchors.margins: 5
+                height: 25
+                onClicked: {
+                    setRefPoints(bb1.getRefPoint(), bb2.getRefPoint())
+                }
+            }
+            Button{
+                id:startbtn
+                text: "start"
+                width:50
+                height:50
+                x:50
+                y:300
+                onClicked:start()
+            }
+
+
 
              ScrollBar{
                 id: scroll
@@ -191,7 +208,7 @@ Rectangle{
                 orientation: Qt.Vertical
                 hoverEnabled: true
                 active: hovered || pressed
-                size: rightPanel.height/(palPanel.y+palPanel.height)
+//                size: rightPanel.height/(palPanel.y+palPanel.height)
                 onPositionChanged: {
                     checkbox.y = -scroll.position*rightPanel.height
                     twobbtext.y = -scroll.position*rightPanel.height

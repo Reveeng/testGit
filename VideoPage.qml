@@ -10,6 +10,7 @@ Item{
      property bool firstChangeH: true
      property bool settingMode: false
      property bool autoplay:false
+     property real aspectRatio:4/3
 
      //alias properties
      property alias bb1X:bb1indicator.x
@@ -88,6 +89,7 @@ Item{
          onFpsChanged: {
              console.log(fps)
          }
+         onMaxTempInRoiChanged: console.log(max)
      }
      VideoOutput{
          id:output
@@ -101,22 +103,31 @@ Item{
             anchors.verticalCenter: parent.verticalCenter
             hoverEnabled: true
             acceptedButtons: Qt.RightButton
+
             BlackBodyIndicator{
                 id:bb1indicator
                 color: "red"
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
+//                onEndOfMovement: {console.log(bb1indicator.x,' ',bb1indicator.y, ' ', bb1indicator.width, ' ', bb1indicator.height)}
+                visible: true
             }
             BlackBodyIndicator{
                 id:bb2indicator
                 color: "green"
-                onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
-                onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
-
+                onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
+                onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
+//                onEndOfMovement: {console.log(bb2indicator.x,' ',bb2indicator.y)}
+                visible: true
             }
 
             RectOnScreen{
                 id:rectonscreen
+                visible: true
+                onEndOfMovement: {
+                    console.log(x,y,height,width)
+                    myplayer.setRoiToStatistic(x,y,height,width)
+                }
             }
 
             BusyIndicator {
@@ -146,40 +157,52 @@ Item{
      }
 
      //functions
+
+     function setRefPoints(point1, point2){
+        if (point1[2] < point2[2]){
+            myplayer.setRefPoints(point1[0],point1[1],point1[2], true)
+            myplayer.setRefPoints(point2[0],point2[1],point2[2], false)
+        }
+        else{
+            myplayer.setRefPoints(point1[0],point1[1],point1[2], false)
+            myplayer.setRefPoints(point2[0],point2[1],point2[2], true)
+        }
+     }
+
      function scaling(){
-         if (width/height < 4/3){
+         if (width/height < aspectRatio){
              mouseArea.width = output.width
-             mouseArea.height = 3/4*output.width
+             mouseArea.height = (1/aspectRatio)*output.width
              rectonscreen.scaleRect(mouseArea.height , mouseArea.width)
              bb1indicator.scaleDots(mouseArea.height , mouseArea.width)
              bb2indicator.scaleDots(mouseArea.height , mouseArea.width)
              }
          else{
              mouseArea.height = output.height
-             mouseArea.width = 4/3*output.height
+             mouseArea.width = aspectRatio*output.height
              rectonscreen.scaleRect(mouseArea.height , mouseArea.width)
              bb1indicator.scaleDots(mouseArea.height , mouseArea.width)
              bb2indicator.scaleDots(mouseArea.height , mouseArea.width)
          }
      }
-     function scaleAndSendCoord1BB(oldx, oldy, number){
-            var newx = Math.round(oldx*640/mouseArea.width)
-            var newy = Math.round(oldy*480/mouseArea.height)
-            bbChangedByButton(newx,newy,number)
-     }
-     function setCoordToHighLiter(x,y,number){
-         if(number === 1){
-             bb1indicator.x = x
-             bb1indicator.y = y
-         }
-         else{
-             bb2indicator.x = x
-             bb2indicator.y = y
-         }
-     }
+//     function scaleAndSendCoord1BB(oldx, oldy, number){
+//            var newx = Math.round(oldx*640/mouseArea.width)
+//            var newy = Math.round(oldy*480/mouseArea.height)
+//            bbChangedByButton(newx,newy,number)
+//     }
+
+//     function setCoordToHighLiter(x,y,number){
+//         if(number === 1){
+//             bb1indicator.x = x
+//             bb1indicator.y = y
+//         }
+//         else{
+//             bb2indicator.x = x
+//             bb2indicator.y = y
+//         }
+//     }
 
      function startPlayer(){
-        console.log("start")
         myplayer.start()
      }
 

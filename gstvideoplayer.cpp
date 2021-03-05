@@ -19,21 +19,21 @@ static GstFlowReturn OnAppsinkNewFrame(GstElement *sink, GstVideoPlayer *videopl
 GstVideoPlayer::GstVideoPlayer(QObject * parent) : QObject(parent),
     m_videoSurface(0),
     m_source(""),
+    m_tfmtemperature(new TfmTemperature(this)),
     m_pipeline(nullptr),
     m_appsink(nullptr),
     m_sinkName("sink0"),
     m_fps(0),
     m_lastTimestamp(0)
-
 {
     gst_init(NULL, NULL);
-    m_deconv = new Deconv;
-    m_deconv->setFftSize(1024);
+    m_deconv = new Deconv(1024,0,this);
+    contraster = new TfmContraster(this);
     connect(this, &GstVideoPlayer::newFrame, this, &GstVideoPlayer::updateFrame);
+    connect(m_tfmtemperature->stat(), &TfmTemperatureStatistics::maxChanged, this, &GstVideoPlayer::maxTempInRoiChanged);
 }
 GstVideoPlayer::~GstVideoPlayer(){
     closeSurface();
-    delete m_deconv;
 }
 
 void GstVideoPlayer::registerQmlType()
@@ -41,6 +41,13 @@ void GstVideoPlayer::registerQmlType()
     qmlRegisterType<GstVideoPlayer>(
             "GstVideoPlayer", 0, 1,
             "GstVideoPlayer" );
+    qmlRegisterType<TfmTemperature>("TfmTemperature",0,1,"TfmTemperature");
+    qmlRegisterType<TfmTemperatureStatistics>("TfmTemperatureStatistics",0,1,"TfmTemperatureStatistics");
+    qmlRegisterType<TfmRefpoint>("RefPoint", 1, 0, "RefPoint");
+}
+
+TfmTemperature* GstVideoPlayer::tfmtemperature() const{
+    return m_tfmtemperature;
 }
 
 void GstVideoPlayer::setVideoSurface (QAbstractVideoSurface *surface){
@@ -153,7 +160,7 @@ int GstVideoPlayer::pullAppsinkFrame(){
     bool ok;
     QVideoFrame frame;
 
-
+//    TfmContraster contraster;
     /* Retrieve the buffer */
     g_signal_emit_by_name (m_appsink, "pull-sample", &sample);
     if (! sample) {
@@ -172,6 +179,11 @@ int GstVideoPlayer::pullAppsinkFrame(){
             size.setHeight((QCaps[i].split(QLatin1Char(')'))[1].remove(-1,1)).toInt(&ok,10));
         }
     }
+
+    //set size to tfmtemperature
+    m_tfmtemperature->setHeight(size.height());
+    m_tfmtemperature->setWidth(size.width());
+
 
     if (size.height() != m_format.frameSize().height() || size.width() != m_format.frameSize().width()){
         closeSurface();
@@ -196,16 +208,22 @@ int GstVideoPlayer::pullAppsinkFrame(){
 
     /* Get mapped data*/
     guint8 *dataptr = info.data;
-//    qDebug() << info.size;
     memcpy(frameBuf,dataptr,info.size);
+//    qDebug() << info.size;
     /*Procces mapped data*/
-    copyToDeconv((int16_t *)frameBuf, size.width(),size.height());
-    m_deconv->calculate();
-    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
+//    copyToDeconv((int16_t *)dataptr, size.width(),size.height());
+//    m_deconv->calculate();
+//    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
+    if (!(!m_tfmtemperature->refCool() | !m_tfmtemperature->refHot()))
+        m_tfmtemperature->calcFrame((int16_t *)frameBuf);
+    contraster->setBufIn((int16_t *)frameBuf);
+    contraster->setBufOut((uint16_t *)frameBuf);
+    contraster->process();
     emit newFrame(frame);
     frame.unmap();
     gst_buffer_unmap(buf,&info);
     gst_sample_unref (sample);
+
     return GST_FLOW_OK;
 }
 
@@ -228,6 +246,7 @@ void GstVideoPlayer::copyToDeconv(int16_t * buf,int width, int height){
     float    *pFft = m_deconv->fftInputBuffer();
     pFft +=  m_deconv->fftDataOffset() + (m_deconv->fftSize()*m_deconv->fftDataOffset());
 
+
     for (int y=0; y < height; y++) {
         for (int x=0; x < width; x++) {
             pFft[x] = buf[x] * 1.0;
@@ -240,7 +259,7 @@ void GstVideoPlayer::copyToDeconv(int16_t * buf,int width, int height){
 
 void GstVideoPlayer::copyFromDeconv(int16_t * buf, int width, int height){
     float coef = m_deconv->fftSize() * m_deconv->fftSize();
-    float    *pFft = m_deconv->fftOutputBuffer();
+    float *pFft = m_deconv->fftOutputBuffer();
 
     for (int y=0; y < height; y++) {
         for (int x=0; x < width; x++) {
@@ -249,6 +268,29 @@ void GstVideoPlayer::copyFromDeconv(int16_t * buf, int width, int height){
         buf += width;
         pFft += m_deconv->fftSize();
     }
-
 }
 
+void GstVideoPlayer::setRefPoints(int x, int y , float t, bool isCool){
+    if (isCool){
+        m_pointCool.setX(x);
+        m_pointCool.setY(y);
+        m_pointCool.setT(t);
+        m_tfmtemperature->setRefCool(&m_pointCool);
+    }
+    else{
+        m_pointHot.setX(x);
+        m_pointHot.setY(y);
+        m_pointHot.setT(t);
+        m_tfmtemperature->setRefHot(&m_pointHot);
+    }
+}
+
+void GstVideoPlayer::setRoiToStatistic(int x, int y, int height, int width){
+    roi.setX(x);
+    roi.setY(y);
+    roi.setHeight(height);
+    roi.setWidth(width);
+    m_tfmtemperature->stat()->setRoi(roi);
+    qDebug() << m_tfmtemperature->stat()->roi();
+
+}
