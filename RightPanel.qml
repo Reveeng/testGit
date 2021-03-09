@@ -28,6 +28,7 @@ Rectangle{
      signal showBlackbody()
      signal saveImagePressed()
      signal settingMode(bool mode)
+     signal setRefPoints(int xCool, int yCool, real tCool, int xHot, int yHot, real tHot)
 
      //proccesing signals
      onFbbChanged: {
@@ -81,53 +82,53 @@ Rectangle{
                  }
              }
 
-             CheckBox {
-                 id:checkbox
-                 x: 176
-                 y: 0
-                 width: 24
-                 height: 20
-                 text: qsTr("Check Box")
-                 indicator.width:10
-                 indicator.height: 10
-                 focusPolicy: Qt.NoFocus
-                 nextCheckState: {
-                    if (checkState === Qt.Checked){
+//             CheckBox {
+//                 id:checkbox
+//                 x: 176
+//                 y: 0
+//                 width: 24
+//                 height: 20
+//                 text: qsTr("Check Box")
+//                 indicator.width:10
+//                 indicator.height: 10
+//                 focusPolicy: Qt.NoFocus
+//                 nextCheckState: {
+//                    if (checkState === Qt.Checked){
 //                        showBlackbody()
-                        snapshot.modeOneBB = false
-                        bb2.visible = true
-                        settingbuttons.vis =  true
-                        settingbuttons.anchors.top = bb2.bottom
-                        settingbuttons.state = "2blackBody"
-                    }
-                    else{
-                        snapshot.modeOneBB = true
-                        bb2.visible = false
-                        hideBlackbody2()
-                        settingbuttons.vis = false
-                        settingbuttons.anchors.top = bb1.bottom
-                        settingbuttons.state = "1blackBody"
-                    }
-                 }
-             }
+//                        snapshot.modeOneBB = false
+//                        bb2.visible = true
+//                        settingbuttons.vis =  true
+//                        settingbuttons.anchors.top = bb2.bottom
+//                        settingbuttons.state = "2blackBody"
+//                    }
+//                    else{
+//                        snapshot.modeOneBB = true
+//                        bb2.visible = false
+//                        hideBlackbody2()
+//                        settingbuttons.vis = false
+//                        settingbuttons.anchors.top = bb1.bottom
+//                        settingbuttons.state = "1blackBody"
+//                    }
+//                 }
+//             }
 
-             Text {
-                 id:twobbtext
-                 x: 131
-                 y: 0
-                 anchors.verticalCenter: checkbox.verticalCenter
-                 height: 12
-                 text: qsTr("Два АЧТ")
-                 color:"white"
-                 font.pixelSize: 10
-                 anchors.rightMargin: -1
-             }
+//             Text {
+//                 id:twobbtext
+//                 x: 131
+//                 y: 0
+//                 anchors.verticalCenter: checkbox.verticalCenter
+//                 height: 12
+//                 text: qsTr("Два АЧТ")
+//                 color:"white"
+//                 font.pixelSize: 10
+//                 anchors.rightMargin: -1
+//             }
 
              BBItem{
                  id:bb1
                  y: 54
                  index:1
-                 anchors.top: checkbox.bottom
+                 anchors.top: parent.top
                  anchors.topMargin: 5
                  Component.onCompleted: setBlackBody.connect(setBlackBody1)
              }
@@ -135,7 +136,6 @@ Rectangle{
              BBItem{
                 id:bb2
                 y: 135
-                visible: false
                 anchors.top: bb1.bottom
                 anchors.topMargin: 3
                 index: 2
@@ -165,20 +165,41 @@ Rectangle{
 //                 }
 //             }
 
-             Rectangle {
-                 id: rpdivider
-                 x: 2
-                 y: 153
-                 height: 3
-                 color: "#666666"
-                 anchors.left: parent.left
-                 anchors.right: parent.right
-                 anchors.top: settingbuttons.bottom
-                 anchors.topMargin: 10
-                 anchors.leftMargin: 0
-                 anchors.rightMargin: 0
-             }
+//             Rectangle {
+//                 id: rpdivider
+//                 x: 2
+//                 y: 153
+//                 height: 3
+//                 color: "#666666"
+//                 anchors.left: parent.left
+//                 anchors.right: parent.right
+//                 anchors.top: bb2.bottom
+//                 anchors.topMargin: 10
+//                 anchors.leftMargin: 0
+//                 anchors.rightMargin: 0
+//             }
 
+            Button{
+                id:setRefPoints
+                text:"Установить по опорным точкам"
+                anchors.left:parent.left
+                anchors.right: parent.right
+                anchors.top: bb2.bottom
+                anchors.margins: 5
+                height: 25
+                onClicked: {
+
+                }
+            }
+            Button{
+                id:startbtn
+                text: "start"
+                width:50
+                height:50
+                x:50
+                y:300
+                onClicked:rightPanel.start()
+            }
              ScrollBar{
                 id: scroll
                 x: 198
@@ -191,7 +212,7 @@ Rectangle{
                 orientation: Qt.Vertical
                 hoverEnabled: true
                 active: hovered || pressed
-                size: rightPanel.height/(palPanel.y+palPanel.height)
+//                size: rightPanel.height/(palPanel.y+palPanel.height)
                 onPositionChanged: {
                     checkbox.y = -scroll.position*rightPanel.height
                     twobbtext.y = -scroll.position*rightPanel.height

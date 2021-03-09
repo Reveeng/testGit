@@ -9,6 +9,8 @@ Rectangle{
     property double scaleFoctorX:1
     property double scaleFoctorY:1
 
+
+    signal endOfMovement()
     //standart properties
     id: bbi
     x:0
@@ -39,9 +41,10 @@ Rectangle{
         onReleased: {
             parent.xBeforeExp = parent.x*parent.scaleFoctorX
             parent.yBeforeExp = parent.y*parent.scaleFoctorY
+            endOfMovement()
         }
     }
-    function scaleDots(w, h){
+    function scaleDots(h, w){
        bbi.scaleFoctorX = 640/w
        bbi.scaleFoctorY = 480/h
        bbi.x = Math.round(bb1indicator.xBeforeExp*w/640)

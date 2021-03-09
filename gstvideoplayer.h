@@ -7,7 +7,7 @@
 #include <QVideoSurfaceFormat>
 #include "../deconv-fft-lib/deconv.h"
 #include "../tfm-contraster-lib/tfmcontraster.h"
-
+#include "../tfm-temperature-lib/tfmtemperature.h"
 
 class GstVideoPlayer : public QObject
 {
@@ -49,6 +49,8 @@ public slots:
 
     void setErr(QString err);
 
+    void setRefPoints(int x, int y, float t, bool isCool);
+
 protected slots:
     void setLastTimestamp(ulong timestamp);
 
@@ -70,6 +72,8 @@ private:
     QVideoSurfaceFormat  m_format;
     QString m_source;
     Deconv * m_deconv;
+    TfmContraster * contraster;
+    TfmTemperature * m_tfmtemperature;
     QString m_err;
 
 protected:

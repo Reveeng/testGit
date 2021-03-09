@@ -10,6 +10,7 @@ Item{
      property bool firstChangeH: true
      property bool settingMode: false
      property bool autoplay:false
+     property real aspectRatio:4/3
 
      //alias properties
      property alias bb1X:bb1indicator.x
@@ -101,18 +102,22 @@ Item{
             anchors.verticalCenter: parent.verticalCenter
             hoverEnabled: true
             acceptedButtons: Qt.RightButton
+
             BlackBodyIndicator{
                 id:bb1indicator
                 color: "red"
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
+//                onEndOfMovement: {console.log(bb1indicator.x,' ',bb1indicator.y, ' ', bb1indicator.width, ' ', bb1indicator.height)}
+                visible: true
             }
             BlackBodyIndicator{
                 id:bb2indicator
                 color: "green"
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
-
+//                onEndOfMovement: {console.log(bb2indicator.x,' ',bb2indicator.y)}
+                visible: true
             }
 
             RectOnScreen{
@@ -147,16 +152,16 @@ Item{
 
      //functions
      function scaling(){
-         if (width/height < 4/3){
+         if (width/height < aspectRatio){
              mouseArea.width = output.width
-             mouseArea.height = 3/4*output.width
+             mouseArea.height = (1/aspectRatio)*output.width
              rectonscreen.scaleRect(mouseArea.height , mouseArea.width)
              bb1indicator.scaleDots(mouseArea.height , mouseArea.width)
              bb2indicator.scaleDots(mouseArea.height , mouseArea.width)
              }
          else{
              mouseArea.height = output.height
-             mouseArea.width = 4/3*output.height
+             mouseArea.width = aspectRatio*output.height
              rectonscreen.scaleRect(mouseArea.height , mouseArea.width)
              bb1indicator.scaleDots(mouseArea.height , mouseArea.width)
              bb2indicator.scaleDots(mouseArea.height , mouseArea.width)

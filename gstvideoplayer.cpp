@@ -29,11 +29,13 @@ GstVideoPlayer::GstVideoPlayer(QObject * parent) : QObject(parent),
     gst_init(NULL, NULL);
     m_deconv = new Deconv;
     m_deconv->setFftSize(1024);
+    contraster = new TfmContraster;
     connect(this, &GstVideoPlayer::newFrame, this, &GstVideoPlayer::updateFrame);
 }
 GstVideoPlayer::~GstVideoPlayer(){
     closeSurface();
     delete m_deconv;
+    delete contraster;
 }
 
 void GstVideoPlayer::registerQmlType()
@@ -153,7 +155,7 @@ int GstVideoPlayer::pullAppsinkFrame(){
     bool ok;
     QVideoFrame frame;
 
-
+//    TfmContraster contraster;
     /* Retrieve the buffer */
     g_signal_emit_by_name (m_appsink, "pull-sample", &sample);
     if (! sample) {
@@ -172,6 +174,11 @@ int GstVideoPlayer::pullAppsinkFrame(){
             size.setHeight((QCaps[i].split(QLatin1Char(')'))[1].remove(-1,1)).toInt(&ok,10));
         }
     }
+
+    //set size to tfmtemperature
+    m_tfmtemperature->setHeight(size.height());
+    m_tfmtemperature->setWidth(size.width());
+
 
     if (size.height() != m_format.frameSize().height() || size.width() != m_format.frameSize().width()){
         closeSurface();
@@ -197,15 +204,19 @@ int GstVideoPlayer::pullAppsinkFrame(){
     /* Get mapped data*/
     guint8 *dataptr = info.data;
 //    qDebug() << info.size;
-    memcpy(frameBuf,dataptr,info.size);
     /*Procces mapped data*/
-    copyToDeconv((int16_t *)frameBuf, size.width(),size.height());
+    copyToDeconv((int16_t *)dataptr, size.width(),size.height());
     m_deconv->calculate();
     copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
+    m_tfmtemperature->calcFrame((int16_t *)frameBuf);
+    contraster->setBufIn((int16_t *)frameBuf);
+    contraster->setBufOut((uint16_t *)frameBuf);
+    contraster->process();
     emit newFrame(frame);
     frame.unmap();
     gst_buffer_unmap(buf,&info);
     gst_sample_unref (sample);
+
     return GST_FLOW_OK;
 }
 
@@ -228,6 +239,7 @@ void GstVideoPlayer::copyToDeconv(int16_t * buf,int width, int height){
     float    *pFft = m_deconv->fftInputBuffer();
     pFft +=  m_deconv->fftDataOffset() + (m_deconv->fftSize()*m_deconv->fftDataOffset());
 
+
     for (int y=0; y < height; y++) {
         for (int x=0; x < width; x++) {
             pFft[x] = buf[x] * 1.0;
@@ -240,7 +252,7 @@ void GstVideoPlayer::copyToDeconv(int16_t * buf,int width, int height){
 
 void GstVideoPlayer::copyFromDeconv(int16_t * buf, int width, int height){
     float coef = m_deconv->fftSize() * m_deconv->fftSize();
-    float    *pFft = m_deconv->fftOutputBuffer();
+    float *pFft = m_deconv->fftOutputBuffer();
 
     for (int y=0; y < height; y++) {
         for (int x=0; x < width; x++) {
@@ -249,6 +261,15 @@ void GstVideoPlayer::copyFromDeconv(int16_t * buf, int width, int height){
         buf += width;
         pFft += m_deconv->fftSize();
     }
-
 }
 
+void GstVideoPlayer::setRefPoints(int x, int y , float t, bool isCool){
+    TfmRefpoint  point;
+    point.setX(x);
+    point.setY(y);
+    point.setT(t);
+    if (isCool)
+        m_tfmtemperature->setRefCool(&point);
+    else
+        m_tfmtemperature->setRefHot(&point);
+}
