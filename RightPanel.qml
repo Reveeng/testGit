@@ -5,8 +5,6 @@ import QtQuick.Layouts 1.3
 
 Rectangle{
      //properties
-     property var fbb: [bb1.textX,bb1.textY,bb1.temp,bb1.macCB.currentText]
-     property var sbb: [bb2.textX,bb2.textY,bb2.temp,bb2.macCB.currentText]
 
      //alias properties
      property alias textX1: bb1.textX
@@ -21,6 +19,7 @@ Rectangle{
      color: "#2d2d2d"
 
      //signals
+     signal start()
      signal setBlackBody1(int x, int y)
      signal setBlackBody2(int x, int y)
      signal hasTwoBB()
@@ -28,15 +27,13 @@ Rectangle{
      signal showBlackbody()
      signal saveImagePressed()
      signal settingMode(bool mode)
+<<<<<<< HEAD
      signal setRefPoints(int xCool, int yCool, real tCool, int xHot, int yHot, real tHot)
+=======
+     signal setRefPoints(var point1, var point2)
+>>>>>>> fa21a2fbf5457dcfdb3cb28ab6434158f2aad858
 
      //proccesing signals
-     onFbbChanged: {
-        console.log(fbb)
-     }
-     onSbbChanged: {
-        console.log(sbb)
-     }
 
     //two tab view
      StackLayout{
@@ -178,6 +175,33 @@ Rectangle{
 //                 anchors.leftMargin: 0
 //                 anchors.rightMargin: 0
 //             }
+<<<<<<< HEAD
+=======
+
+            Button{
+                id:setRefPointsBtn
+                text:"Установить опорные точки"
+                anchors.left:parent.left
+                anchors.right: parent.right
+                anchors.top: bb2.bottom
+                anchors.margins: 5
+                height: 25
+                onClicked: {
+                    setRefPoints(bb1.getRefPoint(), bb2.getRefPoint())
+                }
+            }
+            Button{
+                id:startbtn
+                text: "start"
+                width:50
+                height:50
+                x:50
+                y:300
+                onClicked:start()
+            }
+
+
+>>>>>>> fa21a2fbf5457dcfdb3cb28ab6434158f2aad858
 
             Button{
                 id:setRefPoints

@@ -17,6 +17,7 @@ class GstVideoPlayer : public QObject
     Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface)
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(QString err READ err WRITE setErr NOTIFY errChanged)
+    Q_PROPERTY(TfmTemperature *tfmtemperature READ tfmtemperature)
 
 
 public:
@@ -33,7 +34,15 @@ public:
 
     QString err() const;
 
+    TfmTemperature * tfmtemperature() const;
+
     int pullAppsinkFrame();
+
+    TfmRefpoint m_pointCool;
+
+    TfmRefpoint m_pointHot;
+
+    QRect roi;
 public slots:
     void setFps(int fps);
 
@@ -51,6 +60,8 @@ public slots:
 
     void setRefPoints(int x, int y, float t, bool isCool);
 
+    void setRoiToStatistic(int x, int y, int height, int width);
+
 protected slots:
     void setLastTimestamp(ulong timestamp);
 
@@ -61,6 +72,7 @@ signals:
     void newFrame(QVideoFrame frame);
     void errChanged(QString err);
     void fpsChanged(int fps);
+    void maxTempInRoiChanged(float max);
 
 private slots:
     void closeSurface();

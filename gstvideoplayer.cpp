@@ -19,23 +19,21 @@ static GstFlowReturn OnAppsinkNewFrame(GstElement *sink, GstVideoPlayer *videopl
 GstVideoPlayer::GstVideoPlayer(QObject * parent) : QObject(parent),
     m_videoSurface(0),
     m_source(""),
+    m_tfmtemperature(new TfmTemperature(this)),
     m_pipeline(nullptr),
     m_appsink(nullptr),
     m_sinkName("sink0"),
     m_fps(0),
     m_lastTimestamp(0)
-
 {
     gst_init(NULL, NULL);
-    m_deconv = new Deconv;
-    m_deconv->setFftSize(1024);
-    contraster = new TfmContraster;
+    m_deconv = new Deconv(1024,0,this);
+    contraster = new TfmContraster(this);
     connect(this, &GstVideoPlayer::newFrame, this, &GstVideoPlayer::updateFrame);
+    connect(m_tfmtemperature->stat(), &TfmTemperatureStatistics::maxChanged, this, &GstVideoPlayer::maxTempInRoiChanged);
 }
 GstVideoPlayer::~GstVideoPlayer(){
     closeSurface();
-    delete m_deconv;
-    delete contraster;
 }
 
 void GstVideoPlayer::registerQmlType()
@@ -43,6 +41,13 @@ void GstVideoPlayer::registerQmlType()
     qmlRegisterType<GstVideoPlayer>(
             "GstVideoPlayer", 0, 1,
             "GstVideoPlayer" );
+    qmlRegisterType<TfmTemperature>("TfmTemperature",0,1,"TfmTemperature");
+    qmlRegisterType<TfmTemperatureStatistics>("TfmTemperatureStatistics",0,1,"TfmTemperatureStatistics");
+    qmlRegisterType<TfmRefpoint>("RefPoint", 1, 0, "RefPoint");
+}
+
+TfmTemperature* GstVideoPlayer::tfmtemperature() const{
+    return m_tfmtemperature;
 }
 
 void GstVideoPlayer::setVideoSurface (QAbstractVideoSurface *surface){
@@ -203,12 +208,21 @@ int GstVideoPlayer::pullAppsinkFrame(){
 
     /* Get mapped data*/
     guint8 *dataptr = info.data;
+    memcpy(frameBuf,dataptr,info.size);
 //    qDebug() << info.size;
     /*Procces mapped data*/
-    copyToDeconv((int16_t *)dataptr, size.width(),size.height());
-    m_deconv->calculate();
-    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
+//    copyToDeconv((int16_t *)dataptr, size.width(),size.height());
+//    m_deconv->calculate();
+//    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
     m_tfmtemperature->calcFrame((int16_t *)frameBuf);
+
+//    qDebug() << info.size;
+    /*Procces mapped data*/
+//    copyToDeconv((int16_t *)dataptr, size.width(),size.height());
+//    m_deconv->calculate();
+//    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
+    if (!(!m_tfmtemperature->refCool() | !m_tfmtemperature->refHot()))
+        m_tfmtemperature->calcFrame((int16_t *)frameBuf);
     contraster->setBufIn((int16_t *)frameBuf);
     contraster->setBufOut((uint16_t *)frameBuf);
     contraster->process();
@@ -272,4 +286,13 @@ void GstVideoPlayer::setRefPoints(int x, int y , float t, bool isCool){
         m_tfmtemperature->setRefCool(&point);
     else
         m_tfmtemperature->setRefHot(&point);
+}
+
+void GstVideoPlayer::setRoiToStatistic(int x, int y, int height, int width){
+    roi.setX(x);
+    roi.setY(y);
+    roi.setHeight(height);
+    roi.setWidth(width);
+    m_tfmtemperature->stat()->setRoi(roi);
+    qDebug() << m_tfmtemperature->stat()->roi();
 }

@@ -59,6 +59,7 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../deconv-fft-lib/d
 INCLUDEPATH += $$PWD/../deconv-fft-lib
 DEPENDPATH += $$PWD/../deconv-fft-lib
 
+
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../tfm-contraster-lib/release/ -ltfm-contraster-lib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../tfm-contraster-lib/debug/ -ltfm-contraster-lib
 

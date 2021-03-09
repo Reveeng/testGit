@@ -89,6 +89,7 @@ Item{
          onFpsChanged: {
              console.log(fps)
          }
+         onMaxTempInRoiChanged: console.log(max)
      }
      VideoOutput{
          id:output
@@ -114,14 +115,24 @@ Item{
             BlackBodyIndicator{
                 id:bb2indicator
                 color: "green"
+<<<<<<< HEAD
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
+=======
+                onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
+                onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
+>>>>>>> fa21a2fbf5457dcfdb3cb28ab6434158f2aad858
 //                onEndOfMovement: {console.log(bb2indicator.x,' ',bb2indicator.y)}
                 visible: true
             }
 
             RectOnScreen{
                 id:rectonscreen
+                visible: true
+                onEndOfMovement: {
+                    console.log(x,y,height,width)
+                    myplayer.setRoiToStatistic(x,y,height,width)
+                }
             }
 
             BusyIndicator {
@@ -151,6 +162,18 @@ Item{
      }
 
      //functions
+
+     function setRefPoints(point1, point2){
+        if (point1[2] < point2[2]){
+            myplayer.setRefPoints(point1[0],point1[1],point1[2], true)
+            myplayer.setRefPoints(point2[0],point2[1],point2[2], false)
+        }
+        else{
+            myplayer.setRefPoints(point1[0],point1[1],point1[2], false)
+            myplayer.setRefPoints(point2[0],point2[1],point2[2], true)
+        }
+     }
+
      function scaling(){
          if (width/height < aspectRatio){
              mouseArea.width = output.width
@@ -167,24 +190,24 @@ Item{
              bb2indicator.scaleDots(mouseArea.height , mouseArea.width)
          }
      }
-     function scaleAndSendCoord1BB(oldx, oldy, number){
-            var newx = Math.round(oldx*640/mouseArea.width)
-            var newy = Math.round(oldy*480/mouseArea.height)
-            bbChangedByButton(newx,newy,number)
-     }
-     function setCoordToHighLiter(x,y,number){
-         if(number === 1){
-             bb1indicator.x = x
-             bb1indicator.y = y
-         }
-         else{
-             bb2indicator.x = x
-             bb2indicator.y = y
-         }
-     }
+//     function scaleAndSendCoord1BB(oldx, oldy, number){
+//            var newx = Math.round(oldx*640/mouseArea.width)
+//            var newy = Math.round(oldy*480/mouseArea.height)
+//            bbChangedByButton(newx,newy,number)
+//     }
+
+//     function setCoordToHighLiter(x,y,number){
+//         if(number === 1){
+//             bb1indicator.x = x
+//             bb1indicator.y = y
+//         }
+//         else{
+//             bb2indicator.x = x
+//             bb2indicator.y = y
+//         }
+//     }
 
      function startPlayer(){
-        console.log("start")
         myplayer.start()
      }
 
