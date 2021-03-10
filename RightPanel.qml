@@ -27,11 +27,7 @@ Rectangle{
      signal showBlackbody()
      signal saveImagePressed()
      signal settingMode(bool mode)
-<<<<<<< HEAD
-     signal setRefPoints(int xCool, int yCool, real tCool, int xHot, int yHot, real tHot)
-=======
      signal setRefPoints(var point1, var point2)
->>>>>>> fa21a2fbf5457dcfdb3cb28ab6434158f2aad858
 
      //proccesing signals
 
@@ -175,33 +171,6 @@ Rectangle{
 //                 anchors.leftMargin: 0
 //                 anchors.rightMargin: 0
 //             }
-<<<<<<< HEAD
-=======
-
-            Button{
-                id:setRefPointsBtn
-                text:"Установить опорные точки"
-                anchors.left:parent.left
-                anchors.right: parent.right
-                anchors.top: bb2.bottom
-                anchors.margins: 5
-                height: 25
-                onClicked: {
-                    setRefPoints(bb1.getRefPoint(), bb2.getRefPoint())
-                }
-            }
-            Button{
-                id:startbtn
-                text: "start"
-                width:50
-                height:50
-                x:50
-                y:300
-                onClicked:start()
-            }
-
-
->>>>>>> fa21a2fbf5457dcfdb3cb28ab6434158f2aad858
 
             Button{
                 id:setRefPoints

@@ -30,7 +30,7 @@ GstVideoPlayer::GstVideoPlayer(QObject * parent) : QObject(parent),
     m_deconv = new Deconv(1024,0,this);
     contraster = new TfmContraster(this);
     connect(this, &GstVideoPlayer::newFrame, this, &GstVideoPlayer::updateFrame);
-    connect(m_tfmtemperature->stat(), &TfmTemperatureStatistics::maxChanged, this, &GstVideoPlayer::maxTempInRoiChanged);
+    connect(m_tfmtemperature->stat(), SIGNAL(maxChanged(float)), this, SIGNAL(maxTempInRoiChanged(float)));
 }
 GstVideoPlayer::~GstVideoPlayer(){
     closeSurface();

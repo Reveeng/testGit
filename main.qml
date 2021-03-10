@@ -41,9 +41,9 @@ Window {
                 rightPanel.textY2 = y
             }
         }
-        Component.onCompleted: {
-            bbChangedByMouse.connect()
-        }
+//        Component.onCompleted: {
+//            bbChangedByMouse.connect()
+//        }
     }
 
     Rectangle {
@@ -76,14 +76,9 @@ Window {
         anchors.bottom: parent.bottom
         anchors.right:parent.right
         width:208
-<<<<<<< HEAD
-        onStart: root.start()
-=======
         onSetRefPoints: {
             vpage.setRefPoints(point1, point2)
         }
         onStart: vpage.startPlayer()
-//        onStart: root.start()
->>>>>>> fa21a2fbf5457dcfdb3cb28ab6434158f2aad858
     }
 }

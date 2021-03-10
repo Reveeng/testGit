@@ -89,7 +89,7 @@ Item{
          onFpsChanged: {
              console.log(fps)
          }
-         onMaxTempInRoiChanged: console.log(max)
+         onMaxTempInRoiChanged: rectonscreen.maxT = max
      }
      VideoOutput{
          id:output
@@ -115,13 +115,8 @@ Item{
             BlackBodyIndicator{
                 id:bb2indicator
                 color: "green"
-<<<<<<< HEAD
-                onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
-                onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
-=======
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
->>>>>>> fa21a2fbf5457dcfdb3cb28ab6434158f2aad858
 //                onEndOfMovement: {console.log(bb2indicator.x,' ',bb2indicator.y)}
                 visible: true
             }

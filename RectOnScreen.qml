@@ -13,7 +13,7 @@ Rectangle {
     property int heightDev:0
     property int widthDev:0
 
-
+    property var maxT: ""
     signal endOfMovement(int x, int y , int height, int width)
     //standart properies
     id:parRect
@@ -36,7 +36,22 @@ Rectangle {
         savePosAndGeom(parRect.x*scaleFactorX,parRect.y*scaleFactorY,parRect.height*scaleFactorX,parRect.width*scaleFactorY,0)
     }
     onHeightDevChanged: parRect.height = heightDev*scaleFactorX
+    Text{
+        id: maxTemp
+        x: 23
+        y: 0
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.rightMargin: 3
+        anchors.left:parent.left
+        anchors.leftMargin: parent.width/2
+        color: "white"
+        horizontalAlignment: Text.AlignRight
+        verticalAlignment: Text.AlignVCenter
+        font.pixelSize: 10
+        text:"max - "+maxT
 
+    }
     //widgets
     MouseArea {
         anchors.fill: parent

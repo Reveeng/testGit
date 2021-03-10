@@ -46,21 +46,12 @@ Rectangle{
         }
     }
     function scaleDots(h, w){
-<<<<<<< HEAD
-       bbi.scaleFoctorX = 640/w
-       bbi.scaleFoctorY = 480/h
-       bbi.x = Math.round(bb1indicator.xBeforeExp*w/640)
-       bbi.y = Math.round(bb1indicator.yBeforeExp*h/480)
-       bbi.height = Math.round(bb1indicator.heightBeforeExp*h/480)
-       bbi.width = Math.round(bb1indicator.widthBeforeExp*w/640)
-=======
        scaleFoctorX = 640/w
        scaleFoctorY = 480/h
        x = Math.round(xBeforeExp*w/640)
        y = Math.round(yBeforeExp*h/480)
        height = Math.round(heightBeforeExp*h/480)
        width = Math.round(widthBeforeExp*w/640)
->>>>>>> fa21a2fbf5457dcfdb3cb28ab6434158f2aad858
     }
 
 }
