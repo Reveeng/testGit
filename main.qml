@@ -6,7 +6,7 @@ import QtQuick.Controls 2.12
 Window {
     id:root
     width: 850
-    height: 480
+    height: 495
     visible: true
     color: "#2d2d2d"
     title: qsTr("Hello World")
@@ -20,16 +20,20 @@ Window {
             vpage.state = "default"
         }
     }
-
+    WindowForAdress{
+        id:windForAdr
+        x:(parent.width-width)/2
+        y:(parent.height-height)/2
+        onAdressAccepted:{
+            vpage.source = adress
+        }
+    }
     VideoPage{
         id:vpage
         anchors.top:parent.top
         anchors.bottom:parent.bottom
         anchors.left: parent.left
         anchors.right:devider.left
-        source: "rtspsrc location=rtsp://192.168.0.115/rawdata latency=0 ! "+
-        "rtpvrawdepay ! queue ! "+
-        "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
         autoplay:true
         onBbChangedByMouse: {
             if (number == 1){
@@ -41,9 +45,6 @@ Window {
                 rightPanel.textY2 = y
             }
         }
-//        Component.onCompleted: {
-//            bbChangedByMouse.connect()
-//        }
     }
 
     Rectangle {
@@ -52,19 +53,8 @@ Window {
         anchors.top:parent.top
         anchors.bottom:parent.bottom
         anchors.right:rightPanel.left
-        color: "#808080"
+        color: "#595959"
     }
-
-//    Button{
-//        id:btn
-//        anchors.right: parent.right
-//        anchors.top:parent.top
-//        height: 45
-//        width: 60
-//        onClicked: {
-//            start()
-//        }
-//    }
 
     function start(){
         vpage.startPlayer()
@@ -76,9 +66,15 @@ Window {
         anchors.bottom: parent.bottom
         anchors.right:parent.right
         width:208
-        onSetRefPoints: {
+        onSetRefPointsSig: {
             vpage.setRefPoints(point1, point2)
         }
         onStart: vpage.startPlayer()
+        onSettingMode: {
+            vpage.hideIndicators(mode)
+        }
+        onSetBlackBody1:vpage.setCoordToHighLiter(x,y,1)
+        onSetBlackBody2:vpage.setCoordToHighLiter(x,y,2)
+        onShowAdrWind: windForAdr.visible = true
     }
 }

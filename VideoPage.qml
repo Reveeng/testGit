@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.0
 import QtMultimedia 5.0
 import GstVideoPlayer 0.1
+//import "Round.js" as MyRound
 
 Item{
      //properties
@@ -11,6 +12,7 @@ Item{
      property bool settingMode: false
      property bool autoplay:false
      property real aspectRatio:4/3
+     property var source:""
 
      //alias properties
      property alias bb1X:bb1indicator.x
@@ -19,7 +21,7 @@ Item{
      property alias bb2X:bb2indicator.x
      property alias bb2Y:bb2indicator.y
      property alias bb2Vis:bb2indicator.visible
-     property alias source:myplayer.source
+
      property alias vis: rectonscreen.visible
 
      //signals
@@ -29,7 +31,7 @@ Item{
 
      //standart properties
      width:640
-     height:480
+     height:495
      states:[
          State {name: "default"},
          State {name:"fullscreen"}
@@ -79,21 +81,48 @@ Item{
                 bb2indicator.visible = true
         }
      }
+     Rectangle{
+        id:header
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height:15
+        color:"#666666"
+        Rectangle{
+            id:workIndicator
+            anchors.verticalCenter:  parent.verticalCenter
+            anchors.right: parent.right
+            height:10
+            width:10
+            radius: 10
+            color:"red"
+        }
+     }
 
      //video player
      GstVideoPlayer{
          id:myplayer
+         source:"rtspsrc location=rtsp://192.168.0.115/rawdata latency=0 ! "+
+                "rtpvrawdepay ! queue ! "+
+                "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
          onErrChanged: {
              console.log(err)
+             workIndicator.color = "red"
          }
          onFpsChanged: {
-             console.log(fps)
+//             console.log(fps)
          }
-         onMaxTempInRoiChanged: rectonscreen.maxT = max
+         onMaxTempInRoiChanged: {
+             rectonscreen.maxT = Math.round(max*10)/10}
+         onSourceChanged: console.log(source)
+         onEverythingOkay: workIndicator.color = "green"
      }
      VideoOutput{
          id:output
-         anchors.fill:parent
+         anchors.top:header.bottom
+         anchors.left:parent.left
+         anchors.right: parent.right
+         anchors.bottom: parent.bottom
          source: myplayer
          MouseArea{
             id:mouseArea
@@ -110,7 +139,7 @@ Item{
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
 //                onEndOfMovement: {console.log(bb1indicator.x,' ',bb1indicator.y, ' ', bb1indicator.width, ' ', bb1indicator.height)}
-                visible: true
+//                visible: true
             }
             BlackBodyIndicator{
                 id:bb2indicator
@@ -118,7 +147,7 @@ Item{
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
 //                onEndOfMovement: {console.log(bb2indicator.x,' ',bb2indicator.y)}
-                visible: true
+//                visible: true
             }
 
             RectOnScreen{
@@ -170,7 +199,7 @@ Item{
      }
 
      function scaling(){
-         if (width/height < aspectRatio){
+         if (width/(height-15) < aspectRatio){
              mouseArea.width = output.width
              mouseArea.height = (1/aspectRatio)*output.width
              rectonscreen.scaleRect(mouseArea.height , mouseArea.width)
@@ -191,21 +220,25 @@ Item{
 //            bbChangedByButton(newx,newy,number)
 //     }
 
-//     function setCoordToHighLiter(x,y,number){
-//         if(number === 1){
-//             bb1indicator.x = x
-//             bb1indicator.y = y
-//         }
-//         else{
-//             bb2indicator.x = x
-//             bb2indicator.y = y
-//         }
-//     }
+     function setCoordToHighLiter(x,y,number){
+         if(number === 1){
+             bb1indicator.x = x
+             bb1indicator.y = y
+         }
+         else{
+             bb2indicator.x = x
+             bb2indicator.y = y
+         }
+     }
 
      function startPlayer(){
         myplayer.start()
      }
 
+     function hideIndicators(mode){
+        bb1indicator.visible = mode
+        bb2indicator.visible = mode
+     }
 }
 
 

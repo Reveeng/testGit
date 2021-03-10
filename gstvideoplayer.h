@@ -73,6 +73,7 @@ signals:
     void errChanged(QString err);
     void fpsChanged(int fps);
     void maxTempInRoiChanged(float max);
+    void everythingOkay();
 
 private slots:
     void closeSurface();

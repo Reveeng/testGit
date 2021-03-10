@@ -27,7 +27,8 @@ Rectangle{
      signal showBlackbody()
      signal saveImagePressed()
      signal settingMode(bool mode)
-     signal setRefPoints(var point1, var point2)
+     signal setRefPointsSig(var point1, var point2)
+     signal showAdrWind()
 
      //proccesing signals
 
@@ -181,7 +182,9 @@ Rectangle{
                 anchors.margins: 5
                 height: 25
                 onClicked: {
-
+                    var point1 = bb1.getRefPoint()
+                    var point2 = bb2.getRefPoint()
+                    setRefPointsSig(point1, point2)
                 }
             }
             Button{
@@ -193,23 +196,26 @@ Rectangle{
                 y:300
                 onClicked:rightPanel.start()
             }
-             ScrollBar{
-                id: scroll
-                x: 198
-                y: 0
-                width: 10
-                visible: true
-                anchors.top:parent.top
+             Button{
+                id:setAddres
+                anchors.left:parent.left
                 anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                orientation: Qt.Vertical
-                hoverEnabled: true
-                active: hovered || pressed
-//                size: rightPanel.height/(palPanel.y+palPanel.height)
-                onPositionChanged: {
-                    checkbox.y = -scroll.position*rightPanel.height
-                    twobbtext.y = -scroll.position*rightPanel.height
+                anchors.top: setRefPoints.bottom
+                anchors.margins: 5
+                height:25
+                text:"Установить адрес"
+                onClicked:{
+                    showAdrWind()
                 }
+             }
+             Button{
+                 id:shutterCal
+                 text:"Калибровать по затвору"
+                 anchors.left:parent.left
+                 anchors.right: parent.right
+                 anchors.top: setAddres.bottom
+                 anchors.margins: 5
+                 height: 25
              }
          }
      }

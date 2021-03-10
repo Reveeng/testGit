@@ -8,5 +8,6 @@
         <file>dotsleft.png</file>
         <file>dotsright.png</file>
         <file>BBItem.qml</file>
+        <file>WindowForAdress.qml</file>
     </qresource>
 </RCC>
