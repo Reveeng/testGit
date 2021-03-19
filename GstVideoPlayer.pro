@@ -9,7 +9,8 @@ CONFIG += c++11
 SOURCES += \
         gstvideoplayer.cpp \
         main.cpp \
-    onvif.cpp
+        onvif.cpp \
+        snapshot.cpp
 
 RESOURCES += qml.qrc
 
@@ -31,7 +32,8 @@ LIBS += -llibgio-2.0-0 -llibgstapp-1.0-0 -llibgstbase-1.0-0 -llibgstreamer-1.0-0
 
 HEADERS += \
     gstvideoplayer.h \
-    onvif.h
+    onvif.h \
+    snapshot.h
 
 
 INCLUDEPATH += $$PWD/include

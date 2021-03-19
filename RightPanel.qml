@@ -189,9 +189,12 @@ Rectangle{
             }
             Button{
                 id:startbtn
-                text: "start"
-                width:50
-                height:50
+                text: "Получить видео"
+                anchors.left:parent.left
+                anchors.right: parent.right
+                anchors.margins: 5
+                anchors.top: shutterCal.bottom
+                height:25
                 x:50
                 y:300
                 onClicked:rightPanel.start()
@@ -216,6 +219,9 @@ Rectangle{
                  anchors.top: setAddres.bottom
                  anchors.margins: 5
                  height: 25
+                 onClicked: {
+                    snapshot.shutterCalibr()
+                 }
              }
          }
      }

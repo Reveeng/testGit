@@ -11,6 +11,7 @@ onvif::onvif(QObject *parent): QObject(parent){
 
 onvif::~onvif(){
     delete manager;
+    _thread->deleteLater();
 }
 
 void onvif::makeEnvelopeBegin(QString securityHeader){
@@ -101,27 +102,68 @@ void onvif::sendRequest(QString servicePath,QString soapReqBody, QString cmd){
 
 }
 
+
+
+void onvif::sendGetReq(){
+    QNetworkRequest request;
+//    QNetworkReply *reply;
+    request.setUrl(QUrl("http://127.0.0.1:8000"));
+//    request.setRawHeader("Content-Type","text/xml");
+    manager->get(request);
+}
+
+//void onvif::sendIRMCommand(QString cmd){
+//    QString req = "<tds:SendAuxiliaryCommand><tds:AuxiliaryCommand>infrtst:IRMCommand[";
+//            req += cmd.toUpper();
+//            req += "]</tds:AuxiliaryCommand></tds:SendAuxiliaryCommand>";
+//    onvif::sendRequest("http://192.168.0.111/onvif/device_service",req);
+
+//}
+
 void onvif::sendDeviceCommand(QString cmd){
     QString req = "<tds:SendAuxiliaryCommand><tds:AuxiliaryCommand>infrtst:DeviceCommand[";
     req+=cmd + "]</tds:AuxiliaryCommand></tds:SendAuxiliaryCommand>";
-    onvif::sendRequest("http://"+onvif::adress()+"/onvif/device_service",req,cmd);
+    onvif::sendRequest("http://192.168.0.68/onvif/device_service",req,cmd);
+//    qDebug() << req;
 }
 
-void onvif::getRefPoints(QString message){
-    QStringList bbList = message.split(QLatin1Char(' '));
-    QStringList hotBB;
-    QStringList coldBB;
-    if (bbList.size() != 1){
-        bbList.removeFirst();
-        hotBB = bbList[0].split(QLatin1Char(','));
-        (hotBB[2].indexOf('.') == -1) ? hotBB << "mac" : hotBB << "temp";
-        if (bbList.size() != 1){
-            coldBB = bbList[1].split(QLatin1Char(','));
-            (coldBB[2].indexOf('.') == -1) ? coldBB << "mac" : coldBB << "temp";
-        }
-        else
-            coldBB << "0";
-//        snapshot::bbsReady(hotBB,coldBB);
-    }
+void onvif::synchronizeTime(QString comand, QDate date, int H,int M,int S){
+    QString cmd;
+    if (comand == "currentTime")
+        cmd = "<tds:SetSystemDateAndTime>"
+                "<tds:DateTimeType>Manual</tds:DateTimeType>"
+                "<tds:DaylightSavings>false</tds:DaylightSavings>"
+                "<tds:TimeZone><tt:TZ>ekb-5,5</tt:TZ></tds:TimeZone>"
+                "<tds:UTCDateTime><tt:Time>"
+                "<tt:Hour>"+QVariant(QTime::currentTime().hour()-5).toString()+"</tt:Hour>"
+                "<tt:Minute>"+QVariant(QTime::currentTime().minute()).toString()+"</tt:Minute>"
+                "<tt:Second>"+QVariant(QTime::currentTime().second()).toString()+"</tt:Second>"
+                "</tt:Time>"
+                "<tt:Date>"
+                "<tt:Year>"+QVariant(QDate::currentDate().year()).toString()+"</tt:Year>"
+                "<tt:Month>"+QVariant(QDate::currentDate().month()).toString()+"</tt:Month>"
+                "<tt:Day>"+QVariant(QDate::currentDate().day()).toString()+"</tt:Day>"
+                "</tt:Date>"
+                "</tds:UTCDateTime>"
+                "</tds:SetSystemDateAndTime>";
+    else
+        cmd = "<tds:SetSystemDateAndTime>"
+                "<tds:DateTimeType>Manual</tds:DateTimeType>"
+                "<tds:DaylightSavings>false</tds:DaylightSavings>"
+                "<tds:TimeZone><tt:TZ>ekb-5,5</tt:TZ></tds:TimeZone>"
+                "<tds:UTCDateTime><tt:Time>"
+                "<tt:Hour>"+QVariant(H-5).toString()+"</tt:Hour>"
+                "<tt:Minute>"+QVariant(M).toString()+"</tt:Minute>"
+                "<tt:Second>"+QVariant(S).toString()+"</tt:Second>"
+                "</tt:Time>"
+                "<tt:Date>"
+                "<tt:Year>"+QVariant(date.year()).toString()+"</tt:Year>"
+                "<tt:Month>"+QVariant(date.month()).toString()+"</tt:Month>"
+                "<tt:Day>"+QVariant(date.day()).toString()+"</tt:Day>"
+                "</tt:Date>"
+                "</tds:UTCDateTime>"
+                "</tds:SetSystemDateAndTime>";
+    onvif::sendRequest("http://"+onvif::adress()+"/onvif/device_service",cmd,cmd);
+
 }
 

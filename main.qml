@@ -9,7 +9,7 @@ Window {
     height: 495
     visible: true
     color: "#2d2d2d"
-    title: qsTr("Hello World")
+    title: qsTr("Получение сырых кадров")
 //    flags: /*Qt.FramelessWindowHint | */  Qt.CustomizeWindowHint | Qt.WindowSystemMenuHint | Qt.WindowCloseButtonHint
 
     onVisibilityChanged:{
@@ -56,9 +56,9 @@ Window {
         color: "#595959"
     }
 
-    function start(){
-        vpage.startPlayer()
-    }
+//    function start(){
+//        vpage.startPlayer()
+//    }
 
     RightPanel{
         id:rightPanel

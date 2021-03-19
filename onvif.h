@@ -16,6 +16,9 @@ public:
     explicit onvif(QObject *parent = 0);
     ~onvif();
     void sendRequest(QString servicePath,QString soapReqBody, QString cmd);
+//    void sendIRMCommand(QString cmd);
+
+    void sendGetReq();
     QString adress() const
     {
         return m_adress;
@@ -31,12 +34,13 @@ private:
     void makeEnvelopeBegin(QString securityHeader);
     QString m_adress;
     QString soap;
+    QThread *_thread;
+
     bool m_timeoutCounter;
 
-private slots:
-    void getRefPoints(QString message);
 public slots:
     void sendDeviceCommand(QString cmd);
+    void synchronizeTime(QString comand, QDate date, int H,int M,int S);
     void setAdress(QString adress)
     {
         m_adress = adress;

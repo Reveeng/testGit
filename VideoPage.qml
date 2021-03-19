@@ -102,7 +102,7 @@ Item{
      //video player
      GstVideoPlayer{
          id:myplayer
-         source:"rtspsrc location=rtsp://192.168.0.115/rawdata latency=0 ! "+
+         source:"rtspsrc location=rtsp://192.168.0.68/rawdata latency=0 ! "+
                 "rtpvrawdepay ! queue ! "+
                 "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
          onErrChanged: {
@@ -152,7 +152,7 @@ Item{
 
             RectOnScreen{
                 id:rectonscreen
-                visible: true
+                visible: false
                 onEndOfMovement: {
                     console.log(x,y,height,width)
                     myplayer.setRoiToStatistic(x,y,height,width)
@@ -238,6 +238,7 @@ Item{
      function hideIndicators(mode){
         bb1indicator.visible = mode
         bb2indicator.visible = mode
+        rectonscreen.visible = mode
      }
 }
 

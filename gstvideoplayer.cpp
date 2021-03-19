@@ -1,6 +1,7 @@
 #include "gstvideoplayer.h"
 #include <QtQml/qqml.h>
 #include <QDebug>
+#include <QElapsedTimer>
 
 static GstFlowReturn OnAppsinkEOS(GstElement *sink, GstVideoPlayer *videoplayer)
 {
@@ -31,6 +32,7 @@ GstVideoPlayer::GstVideoPlayer(QObject * parent) : QObject(parent),
     gst_init(NULL, NULL);
     connect(this, &GstVideoPlayer::newFrame, this, &GstVideoPlayer::updateFrame);
     connect(m_tfmtemperature->stat(),SIGNAL(maxChanged(float)), this, SIGNAL(maxTempInRoiChanged(float)));
+    connect(m_deconv, SIGNAL(ready()), this, SLOT(onDeconvReady()));
 }
 GstVideoPlayer::~GstVideoPlayer(){
     closeSurface();
@@ -208,30 +210,30 @@ int GstVideoPlayer::pullAppsinkFrame(){
 
     /* Get mapped data*/
     guint8 *dataptr = info.data;
-    memcpy(frameBuf,dataptr,info.size);
-//    qDebug() << info.size;
-    /*Procces mapped data*/
-//    copyToDeconv((int16_t *)dataptr, size.width(),size.height());
-//    m_deconv->calculate();
-//    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
-//    m_tfmtemperature->calcFrame((int16_t *)frameBuf);
+//    memcpy(frameBuf,dataptr,info.size);
+
 
 //    qDebug() << info.size;
     /*Procces mapped data*/
-//    copyToDeconv((int16_t *)dataptr, size.width(),size.height());
-//    m_deconv->calculate();
-//    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
+
+    copyToDeconv((int16_t *)dataptr, size.width(),size.height());
+    m_deconv->calculate();
+    copyFromDeconv((int16_t *)frameBuf, size.width(), size.height());
+
     if (!(!m_tfmtemperature->refCool() | !m_tfmtemperature->refHot()))
         m_tfmtemperature->calcFrame((int16_t *)frameBuf);
+//    QElapsedTimer timer;
+//    timer.start();
     contraster->setBufIn((int16_t *)frameBuf);
     contraster->setBufOut((uint16_t *)frameBuf);
+//    qDebug() << timer.nsecsElapsed();
     contraster->process();
     emit newFrame(frame);
     frame.unmap();
     gst_buffer_unmap(buf,&info);
     gst_sample_unref (sample);
 
-    return GST_FLOW_OK;
+    return GST_FLOW_OK;  
 }
 
 void GstVideoPlayer::updateFrame(QVideoFrame frame){
@@ -303,4 +305,8 @@ void GstVideoPlayer::setRoiToStatistic(int x, int y, int height, int width){
 //    qDebug() << m_tfmtemperature->refCool()->x() << m_tfmtemperature->refCool()->y() << m_tfmtemperature->refCool()->t();
 //    qDebug() << m_tfmtemperature->refHot()->x() << m_tfmtemperature->refHot()->y() << m_tfmtemperature->refHot()->t();
 
+}
+
+void GstVideoPlayer::onDeconvReady(){
+    qDebug() << "frame ready";
 }
