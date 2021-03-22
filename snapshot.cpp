@@ -6,9 +6,21 @@
 #include <QTimer>
 #include <QDateTime>
 #include <QTimeZone>
+#include <stdlib.h>
+
+snapshot::snapshot(QString appPath):onvif(appPath,nullptr)
+{
+    connect(this,SIGNAL(successRequest(QString)),this,SLOT(processAuxCommandResponse(QString)));
+    initFunctionMap();
+
+}
+
+snapshot::~snapshot(){
+
+}
+
 
 void snapshot::initFunctionMap(){
-    connect(this,SIGNAL(successRequest(QString)),this,SLOT(processAuxCommandResponse(QString)));
 //    connect(this,SIGNAL(unsuccessRequest(QString)),this,SLOT(proccessErrResponce(QString)));
     functionMap.insert("MeterSaveScale",&snapshot::meterSaveScaleSuc);
     functionMap.insert("AllBlackbodyAddresses", &snapshot::allBlackBodyAdressSuc);
@@ -231,6 +243,7 @@ void snapshot::getTempCorrectionSuc(QString message){
 void snapshot::getTempCorrection(){
     this->sendDeviceCommand("TemperatureCorrection get");
 }
+
 void snapshot::applyTempCorrections(QString blackness,QString tAmb){
     QString cmd = "TemperatureCorrection "+blackness+" "+tAmb;
     this->sendDeviceCommand(cmd);

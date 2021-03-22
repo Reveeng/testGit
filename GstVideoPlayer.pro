@@ -10,7 +10,8 @@ SOURCES += \
         gstvideoplayer.cpp \
         main.cpp \
         onvif.cpp \
-        snapshot.cpp
+        snapshot.cpp \
+        systemcom.cpp
 
 RESOURCES += qml.qrc
 
@@ -33,7 +34,8 @@ LIBS += -llibgio-2.0-0 -llibgstapp-1.0-0 -llibgstbase-1.0-0 -llibgstreamer-1.0-0
 HEADERS += \
     gstvideoplayer.h \
     onvif.h \
-    snapshot.h
+    snapshot.h \
+    systemcom.h
 
 
 INCLUDEPATH += $$PWD/include

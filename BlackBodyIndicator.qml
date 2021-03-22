@@ -10,15 +10,13 @@ Rectangle{
     property double scaleFoctorX:1
     property double scaleFoctorY:1
 
+    property alias enableMovement:ma.enabled
 
     signal endOfMovement()
     //standart properties
     id: bbi
-    x:0
-    y:0
     width: 8
     height:8
-    visible:false
 
     //signal proccesing
     onVisibleChanged:{
@@ -30,7 +28,9 @@ Rectangle{
 
     //widgets
     MouseArea{
+        id:ma
         anchors.fill: parent
+        enabled: false
         drag{
             target:parent
             minimumX: 0

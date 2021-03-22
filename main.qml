@@ -11,7 +11,9 @@ Window {
     color: "#2d2d2d"
     title: qsTr("Получение сырых кадров")
 //    flags: /*Qt.FramelessWindowHint | */  Qt.CustomizeWindowHint | Qt.WindowSystemMenuHint | Qt.WindowCloseButtonHint
-
+//    Component.onCompleted: {
+//        snapshot.allBlackBodyAdress()
+//    }
     onVisibilityChanged:{
         if (visibility == 4){
             vpage.state = "fullscreen"
@@ -25,7 +27,7 @@ Window {
         x:(parent.width-width)/2
         y:(parent.height-height)/2
         onAdressAccepted:{
-            vpage.source = adress
+            vpage.setSource(adress)
         }
     }
     VideoPage{

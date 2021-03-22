@@ -62,8 +62,6 @@ public slots:
 
     void setRoiToStatistic(int x, int y, int height, int width);
 
-    void onDeconvReady();
-
 protected slots:
     void setLastTimestamp(ulong timestamp);
 

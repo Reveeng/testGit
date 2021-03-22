@@ -11,6 +11,7 @@ Item {
     property alias temp: tempField.text
     property alias macCB: macs
     property alias lstn: listen.checked
+    property alias indColor: indic.color
 
     //standart properties
     visible: true
@@ -155,6 +156,15 @@ Item {
         width: 168
         height: 23
         focusPolicy: Qt.NoFocus
+    }
+
+    Rectangle {
+        id: indic
+        anchors.verticalCenter: text1.verticalCenter
+        anchors.left:text1.right
+        anchors.leftMargin: 8
+        width: 8
+        height: 8
     }
     function getRefPoint(){
         var bb = [parseInt(textX.text,10), parseInt(textY.text, 10),parseFloat(tempField.text,10)]

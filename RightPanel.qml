@@ -33,6 +33,16 @@ Rectangle{
      //proccesing signals
 
     //two tab view
+     Connections{
+         target: snapshot
+         onMacsChanged:{
+                bb1.macCB.model = snapshot.macs
+                bb2.macCB.model = snapshot.macs
+         }
+         onGetABBadress:{
+              snapshot.aBBAdressWithDelay()
+         }
+     }
      StackLayout{
          width:parent.width
          height: 380
@@ -76,52 +86,11 @@ Rectangle{
                  }
              }
 
-//             CheckBox {
-//                 id:checkbox
-//                 x: 176
-//                 y: 0
-//                 width: 24
-//                 height: 20
-//                 text: qsTr("Check Box")
-//                 indicator.width:10
-//                 indicator.height: 10
-//                 focusPolicy: Qt.NoFocus
-//                 nextCheckState: {
-//                    if (checkState === Qt.Checked){
-//                        showBlackbody()
-//                        snapshot.modeOneBB = false
-//                        bb2.visible = true
-//                        settingbuttons.vis =  true
-//                        settingbuttons.anchors.top = bb2.bottom
-//                        settingbuttons.state = "2blackBody"
-//                    }
-//                    else{
-//                        snapshot.modeOneBB = true
-//                        bb2.visible = false
-//                        hideBlackbody2()
-//                        settingbuttons.vis = false
-//                        settingbuttons.anchors.top = bb1.bottom
-//                        settingbuttons.state = "1blackBody"
-//                    }
-//                 }
-//             }
-
-//             Text {
-//                 id:twobbtext
-//                 x: 131
-//                 y: 0
-//                 anchors.verticalCenter: checkbox.verticalCenter
-//                 height: 12
-//                 text: qsTr("Два АЧТ")
-//                 color:"white"
-//                 font.pixelSize: 10
-//                 anchors.rightMargin: -1
-//             }
-
              BBItem{
                  id:bb1
                  y: 54
                  index:1
+                 indColor: "red"
                  anchors.top: parent.top
                  anchors.topMargin: 5
                  Component.onCompleted: setBlackBody.connect(setBlackBody1)
@@ -130,48 +99,12 @@ Rectangle{
              BBItem{
                 id:bb2
                 y: 135
+                indColor: "green"
                 anchors.top: bb1.bottom
                 anchors.topMargin: 3
                 index: 2
                 Component.onCompleted: setBlackBody.connect(setBlackBody2)
              }
-
-//             SettingButtons{
-//                id:settingbuttons
-//                anchors.top:bb1.bottom
-//                onCalibRefPoints: snapshot.calibrRefPoints(fbb,sbb)
-//             }
-
-//             PalletePanel{
-//                 id:palPanel
-//                 x: 0
-//                 y: 153
-//                 width: 200
-//                 anchors.top: rpdivider.bottom
-//                 anchors.topMargin: 6
-//                 onYChanged: {
-//                    if(y+height>rightPanel.height){
-//                        scroll.size = (rightPanel.height-70)/(y+height)
-//                        scroll.visible = true
-//                    }
-//                    else
-//                        scroll.visible = false
-//                 }
-//             }
-
-//             Rectangle {
-//                 id: rpdivider
-//                 x: 2
-//                 y: 153
-//                 height: 3
-//                 color: "#666666"
-//                 anchors.left: parent.left
-//                 anchors.right: parent.right
-//                 anchors.top: bb2.bottom
-//                 anchors.topMargin: 10
-//                 anchors.leftMargin: 0
-//                 anchors.rightMargin: 0
-//             }
 
             Button{
                 id:setRefPoints

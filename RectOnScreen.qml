@@ -8,8 +8,8 @@ Rectangle {
     property int yBeforeExp:0
     property double scaleFactorX: 1
     property double scaleFactorY: 1
-    property int xDev:0
-    property int yDev:0
+    property int xDev
+    property int yDev
     property int heightDev:0
     property int widthDev:0
 
@@ -17,9 +17,6 @@ Rectangle {
     signal endOfMovement(int x, int y , int height, int width)
     //standart properies
     id:parRect
-    visible: false
-    x:0
-    y:0
     width:50
     height:50
     border {
@@ -134,12 +131,10 @@ Rectangle {
 //                                  Math.round(parRect.height*scaleFactorY).toString())}
     }
     function scaleRect(h, w){
-
         parRect.height = Math.round(rectonscreen.heightBeforeExp*h/480)
         parRect.width = Math.round(rectonscreen.widthBeforeExp*w/640)
         parRect.x = Math.round(rectonscreen.xBeforeExp*w/640)
         parRect.y = Math.round(rectonscreen.yBeforeExp*h/480)
-        console.log(parRect.height,parRect.width,parRect.x,parRect.y)
         parRect.scaleFactorX = 640/w
         parRect.scaleFactorY = 480/h
     }

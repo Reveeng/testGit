@@ -3,19 +3,10 @@
 #include <QObject>
 #include <QtCore>
 #include "onvif.h"
+#include "systemcom.h"
 #include "QDebug"
 #include "QDir"
 #include <QQmlListProperty>
-
-
-//class ThreadForCmd: public QThread
-//{
-//    Q_OBJECT
-//    void run() override{
-
-//    }
-
-//};
 
 class snapshot : public onvif{
     Q_OBJECT
@@ -28,8 +19,10 @@ class snapshot : public onvif{
 
 public:
     QMap<QString,void(snapshot::*)(QString)> functionMap;
-    explicit snapshot(): onvif(){}
-    ~snapshot(){};
+
+    explicit snapshot(QString appPath);
+    ~snapshot();
+
     void initFunctionMap();
 
     bool modeOneBB() const

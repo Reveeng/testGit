@@ -3,16 +3,40 @@
 #include <QNetworkRequest>
 #include <QRegularExpression>
 
-onvif::onvif(QObject *parent): QObject(parent){
-    manager = new QNetworkAccessManager(this);
-    setTimeoutCounter(true);
+onvif::onvif(QString appPath, QObject *parent): systemCom(appPath,parent),
+    manager(new QNetworkAccessManager(this)),
+    m_timeoutCounter(true)
+{
     this->makeEnvelopeBegin("");
 }
 
 onvif::~onvif(){
-    delete manager;
-    _thread->deleteLater();
 }
+
+QString onvif::adress() const
+{
+    return m_adress;
+}
+
+void onvif::setAdress(QString adress)
+{
+    m_adress = adress;
+}
+
+bool onvif::timeoutCounter() const
+{
+    return m_timeoutCounter;
+}
+
+void onvif::setTimeoutCounter(bool timeoutCounter)
+{
+    if (m_timeoutCounter == timeoutCounter)
+        return;
+
+    m_timeoutCounter = timeoutCounter;
+    emit timeoutCounterChanged(m_timeoutCounter);
+}
+
 
 void onvif::makeEnvelopeBegin(QString securityHeader){
     QString soap = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
@@ -102,29 +126,10 @@ void onvif::sendRequest(QString servicePath,QString soapReqBody, QString cmd){
 
 }
 
-
-
-void onvif::sendGetReq(){
-    QNetworkRequest request;
-//    QNetworkReply *reply;
-    request.setUrl(QUrl("http://127.0.0.1:8000"));
-//    request.setRawHeader("Content-Type","text/xml");
-    manager->get(request);
-}
-
-//void onvif::sendIRMCommand(QString cmd){
-//    QString req = "<tds:SendAuxiliaryCommand><tds:AuxiliaryCommand>infrtst:IRMCommand[";
-//            req += cmd.toUpper();
-//            req += "]</tds:AuxiliaryCommand></tds:SendAuxiliaryCommand>";
-//    onvif::sendRequest("http://192.168.0.111/onvif/device_service",req);
-
-//}
-
 void onvif::sendDeviceCommand(QString cmd){
     QString req = "<tds:SendAuxiliaryCommand><tds:AuxiliaryCommand>infrtst:DeviceCommand[";
     req+=cmd + "]</tds:AuxiliaryCommand></tds:SendAuxiliaryCommand>";
-    onvif::sendRequest("http://192.168.0.68/onvif/device_service",req,cmd);
-//    qDebug() << req;
+    onvif::sendRequest("http://"+m_adress+"/onvif/device_service",req,cmd);
 }
 
 void onvif::synchronizeTime(QString comand, QDate date, int H,int M,int S){

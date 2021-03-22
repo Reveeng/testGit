@@ -2,17 +2,13 @@ import QtQuick 2.0
 import QtQuick.Controls 2.0
 import QtMultimedia 5.0
 import GstVideoPlayer 0.1
-//import "Round.js" as MyRound
 
 Item{
      //properties
      property var previousState: "default"
-     property bool firstChangeW: true
-     property bool firstChangeH: true
      property bool settingMode: false
      property bool autoplay:false
      property real aspectRatio:4/3
-     property var source:""
 
      //alias properties
      property alias bb1X:bb1indicator.x
@@ -32,55 +28,26 @@ Item{
      //standart properties
      width:640
      height:495
+
      states:[
          State {name: "default"},
          State {name:"fullscreen"}
      ]
      state: "default"
 
-     //signals proccesing
+    Component.onCompleted: {
+        heightChanged.connect(scaling)
+        widthChanged.connect(scaling)
+        stateChanged.connect(stateProc)
+    }
 
-     //proccesing fullscreen signal
+    Connections{
+        target:snapshot
+        onHasAddress:{
+            setSource(address)
+        }
+    }
 
-     onStateChanged: {
-        if (state == "fullscreen"){
-            scaling()
-        }
-        if (state == "default"){
-            scaling()
-            }
-        }
-
-     //proccesing size changed signals
-     onHeightChanged:{
-        if (firstChangeH)
-            firstChangeH = false
-        else{
-            scaling()
-        }
-     }
-     onWidthChanged: {
-        if (firstChangeW)
-            firstChangeW = false
-        else{
-            scaling()
-        }
-     }
-
-     //call when program set to setting mode
-     onSettingModeChanged: {
-        if (!settingMode){
-            rectonscreen.visible = false
-            bb1indicator.visible = false
-            bb2indicator.visible = false
-        }
-        else{
-            rectonscreen.visible = true
-            bb1indicator.visible =  true
-            if (!snapshot.modeOneBB)
-                bb2indicator.visible = true
-        }
-     }
      Rectangle{
         id:header
         anchors.top: parent.top
@@ -102,9 +69,9 @@ Item{
      //video player
      GstVideoPlayer{
          id:myplayer
-         source:"rtspsrc location=rtsp://192.168.0.68/rawdata latency=0 ! "+
-                "rtpvrawdepay ! queue ! "+
-                "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
+//         source:"rtspsrc location=rtsp://192.168.0.68/rawdata latency=0 ! "+
+//                "rtpvrawdepay ! queue ! "+
+//                "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
          onErrChanged: {
              console.log(err)
              workIndicator.color = "red"
@@ -135,28 +102,34 @@ Item{
 
             BlackBodyIndicator{
                 id:bb1indicator
+                x: 243
+                y: 132
                 color: "red"
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
-//                onEndOfMovement: {console.log(bb1indicator.x,' ',bb1indicator.y, ' ', bb1indicator.width, ' ', bb1indicator.height)}
-//                visible: true
+                visible: true
             }
             BlackBodyIndicator{
                 id:bb2indicator
+                x: 408
+                y: 132
+                width: 8
+                height: 8
                 color: "green"
                 onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
                 onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
-//                onEndOfMovement: {console.log(bb2indicator.x,' ',bb2indicator.y)}
-//                visible: true
+                visible: true
             }
 
             RectOnScreen{
                 id:rectonscreen
-                visible: false
+                x: 295
+                y: 215
                 onEndOfMovement: {
                     console.log(x,y,height,width)
                     myplayer.setRoiToStatistic(x,y,height,width)
                 }
+                visible: true
             }
 
             BusyIndicator {
@@ -220,6 +193,15 @@ Item{
 //            bbChangedByButton(newx,newy,number)
 //     }
 
+     function stateProc(state){
+         if (state === "fullscreen"){
+             scaling()
+         }
+         if (state === "default"){
+             scaling()
+             }
+     }
+
      function setCoordToHighLiter(x,y,number){
          if(number === 1){
              bb1indicator.x = x
@@ -235,10 +217,20 @@ Item{
         myplayer.start()
      }
 
+     function setSource(address){
+        snapshot.adress = address
+        snapshot.allBlackBodyAdress()
+        myplayer.source = "rtspsrc location=rtsp://"+address+"/rawdata latency=0 ! "+
+                          "rtpvrawdepay ! queue ! "+
+                          "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
+        myplayer.start()
+        snapshot.saveAddress(address)
+
+     }
+
      function hideIndicators(mode){
-        bb1indicator.visible = mode
-        bb2indicator.visible = mode
-        rectonscreen.visible = mode
+        bb1indicator.enableMovement = mode
+        bb2indicator.enableMovement = mode
      }
 }
 
