@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QDebug>
+#include <QTimer>
 
 systemCom::systemCom(QString appPath, QObject *parent):QObject(parent),
     m_appPath(appPath)
@@ -55,7 +56,7 @@ void systemCom::createDeviceFile(){
         deviceFile.close();
     }
     else{
-        checkAddress();
+        QTimer::singleShot(1,this,SLOT(checkAddress()));
     }
 }
 

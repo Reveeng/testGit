@@ -5,9 +5,9 @@
 #include <QObject>
 #include <QAbstractVideoSurface>
 #include <QVideoSurfaceFormat>
-#include "../deconv-fft-lib/deconv.h"
-#include "../tfm-contraster-lib/tfmcontraster.h"
-#include "../tfm-temperature-lib/tfmtemperature.h"
+//#include "../deconv-fft-lib/deconv.h"
+//#include "../tfm-contraster-lib/tfmcontraster.h"
+//#include "../tfm-temperature-lib/tfmtemperature.h"
 
 class GstVideoPlayer : public QObject
 {
@@ -17,7 +17,7 @@ class GstVideoPlayer : public QObject
     Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface)
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(QString err READ err WRITE setErr NOTIFY errChanged)
-    Q_PROPERTY(TfmTemperature *tfmtemperature READ tfmtemperature)
+//    Q_PROPERTY(TfmTemperature *tfmtemperature READ tfmtemperature)
 
 
 public:
@@ -34,13 +34,13 @@ public:
 
     QString err() const;
 
-    TfmTemperature * tfmtemperature() const;
+//    TfmTemperature * tfmtemperature() const;
 
     int pullAppsinkFrame();
 
-    TfmRefpoint m_pointCool;
+//    TfmRefpoint m_pointCool;
 
-    TfmRefpoint m_pointHot;
+//    TfmRefpoint m_pointHot;
 
     QRect roi;
 public slots:
@@ -58,9 +58,9 @@ public slots:
 
     void setErr(QString err);
 
-    void setRefPoints(int x, int y, float t, bool isCool);
+//    void setRefPoints(int x, int y, float t, bool isCool);
 
-    void setRoiToStatistic(int x, int y, int height, int width);
+//    void setRoiToStatistic(int x, int y, int height, int width);
 
 protected slots:
     void setLastTimestamp(ulong timestamp);
@@ -77,16 +77,16 @@ signals:
 
 private slots:
     void closeSurface();
-    void copyToDeconv(int16_t * buf, int width, int height);
-    void copyFromDeconv(int16_t * buf, int width, int heigt);
+//    void copyToDeconv(int16_t * buf, int width, int height);
+//    void copyFromDeconv(int16_t * buf, int width, int heigt);
 
 private:
     QAbstractVideoSurface * m_videoSurface;
     QVideoSurfaceFormat  m_format;
     QString m_source;
-    Deconv * m_deconv;
-    TfmContraster * contraster;
-    TfmTemperature * m_tfmtemperature;
+//    Deconv * m_deconv;
+//    TfmContraster * contraster;
+//    TfmTemperature * m_tfmtemperature;
     QString m_err;
 
 protected:

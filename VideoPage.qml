@@ -3,6 +3,7 @@ import QtQuick.Controls 2.0
 import QtMultimedia 5.0
 import GstVideoPlayer 0.1
 
+import infratest.filters 1.0
 Item{
      //properties
      property var previousState: "default"
@@ -65,6 +66,8 @@ Item{
             color:"red"
         }
      }
+     FilterDeconv {id: fltDeconv;}
+     FilterContrast {id: fltContrast;}
 
      //video player
      GstVideoPlayer{
@@ -79,8 +82,8 @@ Item{
          onFpsChanged: {
 //             console.log(fps)
          }
-         onMaxTempInRoiChanged: {
-             rectonscreen.maxT = Math.round(max*10)/10}
+//         onMaxTempInRoiChanged: {
+//             rectonscreen.maxT = Math.round(max*10)/10}
          onSourceChanged: console.log(source)
          onEverythingOkay: workIndicator.color = "green"
      }
@@ -90,6 +93,7 @@ Item{
          anchors.left:parent.left
          anchors.right: parent.right
          anchors.bottom: parent.bottom
+         filters: [fltDeconv,fltContrast ]
          source: myplayer
          MouseArea{
             id:mouseArea
@@ -127,7 +131,7 @@ Item{
                 y: 215
                 onEndOfMovement: {
                     console.log(x,y,height,width)
-                    myplayer.setRoiToStatistic(x,y,height,width)
+//                    myplayer.setRoiToStatistic(x,y,height,width)
                 }
                 visible: true
             }
@@ -160,16 +164,16 @@ Item{
 
      //functions
 
-     function setRefPoints(point1, point2){
-        if (point1[2] < point2[2]){
-            myplayer.setRefPoints(point1[0],point1[1],point1[2], true)
-            myplayer.setRefPoints(point2[0],point2[1],point2[2], false)
-        }
-        else{
-            myplayer.setRefPoints(point1[0],point1[1],point1[2], false)
-            myplayer.setRefPoints(point2[0],point2[1],point2[2], true)
-        }
-     }
+//     function setRefPoints(point1, point2){
+//        if (point1[2] < point2[2]){
+//            myplayer.setRefPoints(point1[0],point1[1],point1[2], true)
+//            myplayer.setRefPoints(point2[0],point2[1],point2[2], false)
+//        }
+//        else{
+//            myplayer.setRefPoints(point1[0],point1[1],point1[2], false)
+//            myplayer.setRefPoints(point2[0],point2[1],point2[2], true)
+//        }
+//     }
 
      function scaling(){
          if (width/(height-15) < aspectRatio){

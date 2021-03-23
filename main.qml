@@ -68,9 +68,9 @@ Window {
         anchors.bottom: parent.bottom
         anchors.right:parent.right
         width:208
-        onSetRefPointsSig: {
-            vpage.setRefPoints(point1, point2)
-        }
+//        onSetRefPointsSig: {
+//            vpage.setRefPoints(point1, point2)
+//        }
         onStart: vpage.startPlayer()
         onSettingMode: {
             vpage.hideIndicators(mode)
