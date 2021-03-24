@@ -168,6 +168,14 @@ Item {
     }
     function getRefPoint(){
         var bb = [parseInt(textX.text,10), parseInt(textY.text, 10),parseFloat(tempField.text,10)]
+        if (listen.checked){
+            bb.push(1)
+            bb.push(macs.currentText)
+        }
+        else{
+            bb.push(0)
+            bb.push(0)
+        }
         return bb
     }
 }

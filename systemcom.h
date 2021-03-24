@@ -17,11 +17,13 @@ public:
 public slots:
     void setPathToSaveDir(QString pathTSD);
     void makeDir();
-    void createDeviceFile();
     void checkAddress();
     void saveAddress(QString address);
 
 private:
+    void createDeviceFile();
+    void createConfigFile();
+    void checkConfig();
     QString m_appPath;
     QString m_pathToSaveDir;
 

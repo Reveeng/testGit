@@ -5,6 +5,7 @@
 #include "snapshot.h"
 #include "filterdeconv.h"
 #include "filtercontrast.h"
+#include "filtertemperature.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +13,13 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
     GstVideoPlayer::registerQmlType();
+    qmlRegisterType<FilterDeconv>("infratest.filters", 1, 0, "FilterDeconv");
+    qmlRegisterType<FilterTemperature>("infratest.filters", 1, 0, "FilterTemperature");
+    qmlRegisterType<FilterContrast>("infratest.filters", 1, 0, "FilterContrast");
+    qmlRegisterType<TfmContraster>("infratest.filters", 1, 0, "Contraster");
+    qmlRegisterType<TfmTemperature>("infratest.filters", 1, 0, "Temperature");
+    qmlRegisterType<TfmRefpoint>("infratest.filters", 1, 0, "Refpoint");
+    qmlRegisterType<TfmTemperatureStatistics>("infratest.filters", 1, 0, "TemperatureStatistics");
     snapshot sst(app.applicationDirPath());
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
@@ -22,8 +30,6 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.rootContext()->setContextProperty("snapshot", &sst);
     engine.load(url);
-    qmlRegisterType<FilterDeconv>("infratest.filters", 1, 0, "FilterDeconv");
-    qmlRegisterType<FilterContrast>("infratest.filters", 1, 0, "FilterContrast");
-    qmlRegisterType<TfmContraster>("infratest.filters", 1, 0, "Contraster");
+
     return app.exec();
 }

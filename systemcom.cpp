@@ -60,6 +60,17 @@ void systemCom::createDeviceFile(){
     }
 }
 
+void systemCom::createConfigFile(){
+    if (!QFile::exists(m_appPath+"config.txt")){
+        QFile configFile(m_appPath+"config.txt");
+        configFile.open(QIODevice::WriteOnly);
+        configFile.close();
+    }
+    else{
+        QTimer::singleShot(1, this, SLOT(checkConfig()));
+    }
+}
+
 void systemCom::checkAddress(){
     QFile deviceFile(m_appPath+"/device.txt");
     deviceFile.open(QIODevice::ReadOnly);
@@ -69,6 +80,17 @@ void systemCom::checkAddress(){
     }
     if (line.size() != 0){
         emit hasAddress(QString::fromStdString(line.toStdString()));
+    }
+}
+
+void systemCom::checkConfig(){
+    QFile configFile(m_appPath+"config.txt");
+    if (configFile.size() != 0){
+        configFile.open(QIODevice::ReadOnly);
+        QByteArray line;
+        while (!configFile.atEnd()){
+
+        }
     }
 }
 

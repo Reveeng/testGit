@@ -4,6 +4,7 @@ import QtMultimedia 5.0
 import GstVideoPlayer 0.1
 
 import infratest.filters 1.0
+
 Item{
      //properties
      property var previousState: "default"
@@ -68,13 +69,21 @@ Item{
      }
      FilterDeconv {id: fltDeconv;}
      FilterContrast {id: fltContrast;}
+     FilterTemperature{id: fltTemperature;
+        temperature.refCool: Refpoint{
+            id:refCool
+        }
+        temperature.refHot: Refpoint{
+            id:refHot
+        }
+        temperature.stat.onMaxChanged: {
+            rectonscreen.maxT = Math.round(max*10)/10
+        }
+     }
 
      //video player
      GstVideoPlayer{
          id:myplayer
-//         source:"rtspsrc location=rtsp://192.168.0.68/rawdata latency=0 ! "+
-//                "rtpvrawdepay ! queue ! "+
-//                "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
          onErrChanged: {
              console.log(err)
              workIndicator.color = "red"
@@ -82,8 +91,6 @@ Item{
          onFpsChanged: {
 //             console.log(fps)
          }
-//         onMaxTempInRoiChanged: {
-//             rectonscreen.maxT = Math.round(max*10)/10}
          onSourceChanged: console.log(source)
          onEverythingOkay: workIndicator.color = "green"
      }
@@ -93,7 +100,7 @@ Item{
          anchors.left:parent.left
          anchors.right: parent.right
          anchors.bottom: parent.bottom
-         filters: [fltDeconv,fltContrast ]
+         filters: [fltDeconv,fltContrast, fltTemperature]
          source: myplayer
          MouseArea{
             id:mouseArea
@@ -129,9 +136,11 @@ Item{
                 id:rectonscreen
                 x: 295
                 y: 215
+                Component.onCompleted: {
+                    fltTemperature.temperature.stat.roi = Qt.rect(x,y,width,height)
+                }
                 onEndOfMovement: {
-                    console.log(x,y,height,width)
-//                    myplayer.setRoiToStatistic(x,y,height,width)
+                    fltTemperature.temperature.stat.roi = Qt.rect(x,y,width,height)
                 }
                 visible: true
             }
@@ -164,16 +173,25 @@ Item{
 
      //functions
 
-//     function setRefPoints(point1, point2){
-//        if (point1[2] < point2[2]){
-//            myplayer.setRefPoints(point1[0],point1[1],point1[2], true)
-//            myplayer.setRefPoints(point2[0],point2[1],point2[2], false)
-//        }
-//        else{
-//            myplayer.setRefPoints(point1[0],point1[1],point1[2], false)
-//            myplayer.setRefPoints(point2[0],point2[1],point2[2], true)
-//        }
-//     }
+     function setRefPoints(point1, point2){
+        console.log(point1, point2)
+        if (point1[2] < point2[2]){
+            refCool.x = point1[0]
+            refCool.y = point1[1]
+            refCool.t = point1[2]
+            refHot.x = point2[0]
+            refHot.y = point2[1]
+            refHot.t = point2[2]
+        }
+        else{
+            refCool.x = point2[0]
+            refCool.y = point2[1]
+            refCool.t = point2[2]
+            refHot.x = point1[0]
+            refHot.y = point1[1]
+            refHot.t = point1[2]
+        }
+     }
 
      function scaling(){
          if (width/(height-15) < aspectRatio){
@@ -191,11 +209,6 @@ Item{
              bb2indicator.scaleDots(mouseArea.height , mouseArea.width)
          }
      }
-//     function scaleAndSendCoord1BB(oldx, oldy, number){
-//            var newx = Math.round(oldx*640/mouseArea.width)
-//            var newy = Math.round(oldy*480/mouseArea.height)
-//            bbChangedByButton(newx,newy,number)
-//     }
 
      function stateProc(state){
          if (state === "fullscreen"){

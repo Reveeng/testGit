@@ -7,6 +7,9 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        filtercontrast.cpp \
+        filterdeconv.cpp \
+        filtertemperature.cpp \
         gstvideoplayer.cpp \
         main.cpp \
         onvif.cpp \
@@ -32,6 +35,9 @@ LIBS += -llibgio-2.0-0 -llibgstapp-1.0-0 -llibgstbase-1.0-0 -llibgstreamer-1.0-0
 
 
 HEADERS += \
+    filtercontrast.h \
+    filterdeconv.h \
+    filtertemperature.h \
     gstvideoplayer.h \
     onvif.h \
     snapshot.h \
@@ -62,7 +68,6 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../deconv-fft-lib/d
 
 INCLUDEPATH += $$PWD/../deconv-fft-lib
 DEPENDPATH += $$PWD/../deconv-fft-lib
-
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../tfm-contraster-lib/release/ -ltfm-contraster-lib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../tfm-contraster-lib/debug/ -ltfm-contraster-lib

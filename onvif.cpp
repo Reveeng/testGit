@@ -80,7 +80,7 @@ void onvif::sendRequest(QString servicePath,QString soapReqBody, QString cmd){
     reply = manager->post(request,soapReq.toLocal8Bit());
     QTimer timer;
     timer.setSingleShot(true);
-    qDebug() << soapReq;
+//    qDebug() << soapReq;
     QEventLoop loop;
     connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
@@ -97,7 +97,7 @@ void onvif::sendRequest(QString servicePath,QString soapReqBody, QString cmd){
                     QString reply = match.captured(1);
                     emit sendToLog(cmd,reply);
                 }
-                qDebug() << replytext;
+//                qDebug() << replytext;
                 setTimeoutCounter(true);
                 emit successRequest(replytext);
             }
