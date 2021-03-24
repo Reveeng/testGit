@@ -86,6 +86,7 @@ void systemCom::checkAddress(){
 
 void systemCom::writeToConfig(){
     QJsonObject blackBody1;
+    blackBody1["x"] = 
 }
 
 void systemCom::checkConfig(){
