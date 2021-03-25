@@ -127,7 +127,7 @@ void snapshot::processAuxCommandResponse(QString replytext){
 }
 
 void snapshot::aBBAdressWithDelay(){
-    QTimer::singleShot(2000,this,SLOT(allBlackBodyAdress()));
+    QTimer::singleShot(10000,this,SLOT(allBlackBodyAdress()));
 }
 
 void snapshot::allBlackBodyAdressSuc(QString message){
@@ -167,12 +167,12 @@ void snapshot::calibrRefPointsUnsuc(QString message){
 
 void snapshot::calibrRefPoints(QStringList bb1, QStringList bb2){
     QString cmd = "CalibrRefPoints";
-    QString mes1 = this->listen1() ? bb1[3] : bb1[2];
+    QString mes1 = this->firstBB()->listen() ? bb1[3] : bb1[2];
     QString mes2;
     if (this->modeOneBB())
         cmd +=" "+bb1[0]+","+bb1[1]+","+mes1;
     else{
-        mes2 = this->listen2() ? bb2[3] : bb2[2];
+        mes2 = this->secondBB()->listen() ? bb2[3] : bb2[2];
         cmd+=" "+bb1[0]+","+bb1[1]+","+mes1+" "+bb2[0]+","+bb2[1]+","+mes2;
     }
     if (this->modeOneBB() && mes1 == mes2)

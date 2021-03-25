@@ -24,7 +24,7 @@ Rectangle {
         color: "steelblue"
     }
     color: "#00000000"
-
+    Component.onCompleted: savePosAndGeom(x,y,width, height, 1)
     //signal proccesing
     onXDevChanged: parRect.x = xDev*scaleFactorX-4
     onYDevChanged: parRect.y = yDev*scaleFactorY-4

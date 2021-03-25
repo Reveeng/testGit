@@ -13,8 +13,6 @@ class snapshot : public onvif{
     Q_PROPERTY(QStringList macs READ macs WRITE setMacs NOTIFY macsChanged)
     Q_PROPERTY(QStringList temps READ temps WRITE setTemps NOTIFY tempsChanged)
     Q_PROPERTY(bool modeOneBB READ modeOneBB WRITE setModeOneBB NOTIFY modeOneBBChanged)
-    Q_PROPERTY(bool listen1 READ listen1 WRITE setListen1)
-    Q_PROPERTY(bool listen2 READ listen2 WRITE setListen2)
     Q_PROPERTY(QString replyError READ replyError WRITE setReplyError NOTIFY replyErrorChanged)
 
 public:
@@ -34,24 +32,6 @@ public:
         if(m_modeOneBB == modeOneBB)
             return;
         m_modeOneBB = modeOneBB;
-    }
-
-    bool listen1() const
-    {
-        return m_listen1;
-    }
-    void setListen1(bool listen1)
-    {
-        m_listen1 = listen1;
-    }
-
-    bool listen2() const
-    {
-        return m_listen2;
-    }
-    void setListen2(bool listen2)
-    {
-        m_listen2 = listen2;
     }
 
     QString replyError() const
@@ -117,10 +97,6 @@ private:
     QString m_mac2;
 
     bool m_modeOneBB;
-
-    bool m_listen1;
-
-    bool m_listen2;
 
     QString m_replyError;
 

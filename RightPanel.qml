@@ -42,6 +42,27 @@ Rectangle{
          onGetABBadress:{
               snapshot.aBBAdressWithDelay()
          }
+         onHasConfig:{
+            var jsonConfig = JSON.parse(config)
+            bb1.textX = jsonConfig["FirstBlackBody"]["x"]
+            bb1.textY = jsonConfig["FirstBlackBody"]["y"]
+            bb1.temp = jsonConfig["FirstBlackBody"]["t"]
+            if (jsonConfig["FirstBlackBody"]["listen"])
+            {
+                bb1.lstn = true
+                var index1 = bb1.macCB.indexOfValue(jsonConfig["FirstBlackBody"]["mac"])
+                bb1.macCB.currentIndex = index1
+            }
+            bb2.textX = jsonConfig["SecondBlackBody"]["x"]
+            bb2.textY = jsonConfig["SecondBlackBody"]["y"]
+            bb2.temp = jsonConfig["SecondBlackBody"]["t"]
+            if (jsonConfig["SecondBlackBody"]["listen"])
+            {
+                bb2.lstn = true
+                var index2 = bb2.macCB.indexOfValue(jsonConfig["SecondBlackBody"]["mac"])
+                bb2.macCB.currentIndex = index2
+            }
+         }
      }
      StackLayout{
          width:parent.width
@@ -94,7 +115,12 @@ Rectangle{
                  anchors.top: parent.top
                  anchors.topMargin: 5
                  Component.onCompleted: setBlackBody.connect(setBlackBody1)
-             }
+                 onTempChanged:temp == "" ? snapshot.firstBB.t = 0 : snapshot.firstBB.t = parseFloat(temp, 10)
+                 onLstnChanged:{
+                    snapshot.firstBB.listen = lstn
+                    lstn ? snapshot.firstBB.mac = curMac : snapshot.firstBB.mac = ""
+                 }
+            }
 
              BBItem{
                 id:bb2
@@ -104,6 +130,11 @@ Rectangle{
                 anchors.topMargin: 3
                 index: 2
                 Component.onCompleted: setBlackBody.connect(setBlackBody2)
+                onTempChanged:temp == "" ? snapshot.secondBB.t = 0 : snapshot.secondBB.t = parseFloat(temp, 10)
+                onLstnChanged: {
+                    snapshot.secondBB.listen = lstn
+                    lstn ?  snapshot.secondBB.mac = curMac : snapshot.secondBB.mac = ""
+                }
              }
 
             Button{
@@ -118,6 +149,7 @@ Rectangle{
                     var point1 = bb1.getRefPoint()
                     var point2 = bb2.getRefPoint()
                     setRefPointsSig(point1, point2)
+                    snapshot.writeToConfig()
                 }
             }
             Button{

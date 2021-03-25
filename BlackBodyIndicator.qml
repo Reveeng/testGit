@@ -17,7 +17,7 @@ Rectangle{
     id: bbi
     width: 8
     height:8
-
+    Component.onCompleted:savePosAndGeom(x,y,width,height)
     //signal proccesing
     onVisibleChanged:{
         xBeforeExp = x*scaleFoctorX
@@ -45,11 +45,20 @@ Rectangle{
             endOfMovement()
         }
     }
+
+    function savePosAndGeom(x,y,width,height){
+        xBeforeExp = x
+        yBeforeExp = y
+        heightBeforeExp = height
+        widthBeforeExp = width
+    }
     function scaleDots(h, w){
        scaleFoctorX = 640/w
        scaleFoctorY = 480/h
+       console.log("before", xBeforeExp)
        x = Math.round(xBeforeExp*w/640)
        y = Math.round(yBeforeExp*h/480)
+       console.log("after", x)
        height = Math.round(heightBeforeExp*h/480)
        width = Math.round(widthBeforeExp*w/640)
     }

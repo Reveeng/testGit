@@ -48,6 +48,14 @@ Item{
         onHasAddress:{
             setSource(address)
         }
+        onHasConfig:{
+            var jsonConfig = JSON.parse(config)
+            bb1indicator.x = jsonConfig["FirstBlackBody"]["x"]
+            bb1indicator.y = jsonConfig["FirstBlackBody"]["y"]
+            bb2indicator.x = jsonConfig["SecondBlackBody"]["x"]
+            bb2indicator.y = jsonConfig["SecondBlackBody"]["y"]
+
+        }
     }
 
      Rectangle{
@@ -116,8 +124,8 @@ Item{
                 x: 243
                 y: 132
                 color: "red"
-                onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
-                onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
+                onXChanged: setCoords(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
+                onYChanged: setCoords(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
                 visible: true
             }
             BlackBodyIndicator{
@@ -127,8 +135,8 @@ Item{
                 width: 8
                 height: 8
                 color: "green"
-                onXChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
-                onYChanged: bbChangedByMouse(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
+                onXChanged: setCoords(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
+                onYChanged: setCoords(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
                 visible: true
             }
 
@@ -248,6 +256,19 @@ Item{
      function hideIndicators(mode){
         bb1indicator.enableMovement = mode
         bb2indicator.enableMovement = mode
+     }
+
+     function setCoords(x, y , count){
+         if (count === 1){
+             snapshot.firstBB.x = x
+             snapshot.firstBB.y = y
+             bbChangedByMouse(x,y,1)
+         }
+         else{
+             snapshot.secondBB.x = x
+             snapshot.secondBB.y = y
+             bbChangedByMouse(x,y,2)
+         }
      }
 }
 

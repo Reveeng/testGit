@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class BlackBody{
+class BlackBody : public QObject{
     Q_OBJECT
 
     Q_PROPERTY(int x READ x WRITE setX)
@@ -13,6 +13,12 @@ class BlackBody{
     Q_PROPERTY(QString mac READ mac WRITE setMac)
 
 public:
+    explicit BlackBody(QObject * parent = nullptr):QObject(parent),
+    m_x(0),m_y(0),m_t(0),m_listen(false), m_mac("")
+    {
+
+    };
+    ~BlackBody(){};
     int x() const{
         return m_x;};
     int y() const{
@@ -71,13 +77,15 @@ public slots:
     void setPathToSaveDir(QString pathTSD);
     void makeDir();
     void checkAddress();
+    void checkConfig(QString address);
     void saveAddress(QString address);
     void writeToConfig();
+private slots:
 
 private:
     void createDeviceFile();
     void createConfigFile();
-    void checkConfig();
+
     QString m_appPath;
     QString m_pathToSaveDir;
     BlackBody *m_firstBB;
@@ -85,6 +93,7 @@ private:
 
 signals:
     void hasAddress(QString address);
+    void hasConfig(QString config);
 };
 
 #endif // SYSTEMCOM_H

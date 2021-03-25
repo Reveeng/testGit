@@ -12,6 +12,7 @@ Item {
     property alias macCB: macs
     property alias lstn: listen.checked
     property alias indColor: indic.color
+    property alias curMac: macs.currentText
 
     //standart properties
     visible: true
@@ -113,12 +114,10 @@ Item {
         focusPolicy: Qt.NoFocus
         nextCheckState: {
                 if (checkState === Qt.Checked){
-                    snapshot.listen = true
                     tempField.enabled = false
                     tempField.text = snapshot.temps[macs.currentIndex]
                 }
                 else{
-                    snapshot.listen = false
                     tempField.enabled = true
                     tempField.text = ""
                 }
