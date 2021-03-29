@@ -51,9 +51,13 @@ Item{
         onHasConfig:{
             var jsonConfig = JSON.parse(config)
             bb1indicator.x = jsonConfig["FirstBlackBody"]["x"]
+            bb1indicator.xBeforeExp = jsonConfig["FirstBlackBody"]["x"]
             bb1indicator.y = jsonConfig["FirstBlackBody"]["y"]
+            bb1indicator.yBeforeExp = jsonConfig["FirstBlackBody"]["y"]
             bb2indicator.x = jsonConfig["SecondBlackBody"]["x"]
+            bb2indicator.xBeforeExp = jsonConfig["SecondBlackBody"]["x"]
             bb2indicator.y = jsonConfig["SecondBlackBody"]["y"]
+            bb2indicator.yBeforeExp = jsonConfig["SecondBlackBody"]["y"]
         }
     }
 

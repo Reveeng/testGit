@@ -37,7 +37,7 @@ Rectangle{
             smoothed: true
         }
         onReleased: {
-            savePosAndGeom(parent.x*parent.scaleFoctorX,parent.y*parent.scaleFoctorY,parent.height*scaleFactorX,parent.width*scaleFactorY)
+            savePosAndGeom(parent.x*parent.scaleFactorX,parent.y*parent.scaleFactorY,parent.height*scaleFactorX,parent.width*scaleFactorY)
             endOfMovement()
         }
     }
