@@ -54,7 +54,6 @@ Item{
             bb1indicator.y = jsonConfig["FirstBlackBody"]["y"]
             bb2indicator.x = jsonConfig["SecondBlackBody"]["x"]
             bb2indicator.y = jsonConfig["SecondBlackBody"]["y"]
-
         }
     }
 

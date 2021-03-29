@@ -19,12 +19,9 @@ Rectangle{
     height:8
     Component.onCompleted:savePosAndGeom(x,y,width,height)
     //signal proccesing
-    onVisibleChanged:{
-        xBeforeExp = x*scaleFoctorX
-        yBeforeExp = y*scaleFoctorY
-        heightBeforeExp = height*scaleFoctorY
-        widthBeforeExp = width*scaleFoctorX
-    }
+    onVisibleChanged: savePosAndGeom(x*scaleFoctorX, y*scaleFoctorY, height*scaleFoctorY, width*scaleFoctorX )
+//    onXChanged: savePosAndGeom(x*scaleFoctorX, y*scaleFoctorY, height*scaleFoctorY, width*scaleFoctorX )
+//    onYChanged: savePosAndGeom(x*scaleFoctorX, y*scaleFoctorY, height*scaleFoctorY, width*scaleFoctorX )
 
     //widgets
     MouseArea{
@@ -40,8 +37,7 @@ Rectangle{
             smoothed: true
         }
         onReleased: {
-            parent.xBeforeExp = parent.x*parent.scaleFoctorX
-            parent.yBeforeExp = parent.y*parent.scaleFoctorY
+            savePosAndGeom(parent.x*parent.scaleFoctorX,parent.y*parent.scaleFoctorY,parent.height*scaleFactorX,parent.width*scaleFactorY)
             endOfMovement()
         }
     }
@@ -55,10 +51,8 @@ Rectangle{
     function scaleDots(h, w){
        scaleFoctorX = 640/w
        scaleFoctorY = 480/h
-       console.log("before", xBeforeExp)
        x = Math.round(xBeforeExp*w/640)
        y = Math.round(yBeforeExp*h/480)
-       console.log("after", x)
        height = Math.round(heightBeforeExp*h/480)
        width = Math.round(widthBeforeExp*w/640)
     }

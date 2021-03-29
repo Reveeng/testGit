@@ -149,7 +149,7 @@ Rectangle{
                     var point1 = bb1.getRefPoint()
                     var point2 = bb2.getRefPoint()
                     setRefPointsSig(point1, point2)
-                    snapshot.writeToConfig()
+//                    snapshot.writeToConfig()
                 }
             }
             Button{

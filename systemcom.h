@@ -15,9 +15,7 @@ class BlackBody : public QObject{
 public:
     explicit BlackBody(QObject * parent = nullptr):QObject(parent),
     m_x(0),m_y(0),m_t(0),m_listen(false), m_mac("")
-    {
-
-    };
+    {};
     ~BlackBody(){};
     int x() const{
         return m_x;};
@@ -58,6 +56,13 @@ private:
     QString m_mac;
 };
 
+//class windSizes: QObject {
+//    Q_OBJECT
+//    Q_PROPERTY(int height READ height WRITE setHeight)
+//    Q_PROPERTY(int width READ width WRITE setWidth)
+//    Q_PROPERTY(+)
+//};
+
 class systemCom:public QObject
 {
     Q_OBJECT
@@ -66,13 +71,22 @@ class systemCom:public QObject
     Q_PROPERTY(QString pathToSaveDir READ pathToSaveDir WRITE setPathToSaveDir)
     Q_PROPERTY(BlackBody *firstBB READ firstBB )
     Q_PROPERTY(BlackBody *secondBB READ secondBB )
+    Q_PROPERTY(int windHeight READ windHeight WRITE setWindHeight)
+    Q_PROPERTY(int windWidth READ windWidth WRITE setWindWidth)
+    Q_PROPERTY(bool fullscreen READ fullscreen WRITE setFullscreen)
 public:
     explicit systemCom(QString appPath, QObject *parent = nullptr);
     ~systemCom();
     QString appPath() const;
     QString pathToSaveDir() const;
+
     BlackBody* firstBB() const;
     BlackBody* secondBB() const;
+
+    int windHeight() const;
+    int windWidth() const;
+    bool fullscreen() const;
+
 public slots:
     void setPathToSaveDir(QString pathTSD);
     void makeDir();
@@ -80,6 +94,12 @@ public slots:
     void checkConfig(QString address);
     void saveAddress(QString address);
     void writeToConfig();
+    void setWindHeight(int windHeight);
+
+    void setWindWidth(int windWidth);
+
+    void setFullscreen(bool fullscreen);
+
 private slots:
 
 private:
@@ -90,6 +110,9 @@ private:
     QString m_pathToSaveDir;
     BlackBody *m_firstBB;
     BlackBody *m_secondBB;
+    int m_windHeight;
+    int m_windWidth;
+    bool m_fullscreen;
 
 signals:
     void hasAddress(QString address);

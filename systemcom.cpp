@@ -11,7 +11,9 @@
 systemCom::systemCom(QString appPath, QObject *parent):QObject(parent),
     m_appPath(appPath),
     m_firstBB(new BlackBody(this)),
-    m_secondBB(new BlackBody(this))
+    m_secondBB(new BlackBody(this)),
+    m_windHeight(480),
+    m_windWidth(640)
 {
     makeDir();
     createDeviceFile();
@@ -47,6 +49,38 @@ BlackBody * systemCom::firstBB() const{
 BlackBody * systemCom::secondBB() const{
     return m_secondBB;
 }
+
+int systemCom::windHeight() const{
+    return m_windHeight;
+}
+
+int systemCom::windWidth() const{
+    return m_windWidth;
+}
+
+bool systemCom::fullscreen() const{
+    return m_fullscreen;
+}
+
+void systemCom::setWindHeight(int height){
+    if (m_windHeight == height)
+        return;
+    m_windHeight = height;
+}
+
+void systemCom::setWindWidth(int width){
+    if (m_windWidth == width)
+        return;
+    m_windWidth = width;
+}
+
+void systemCom::setFullscreen(bool fullscreen){
+    if (m_fullscreen == fullscreen)
+        return;
+    m_fullscreen = fullscreen;
+}
+
+
 
 void systemCom::makeDir(){
     const QStringList homepath =  QStandardPaths::standardLocations(QStandardPaths::DesktopLocation);
@@ -98,9 +132,7 @@ void systemCom::checkAddress(){
 }
 
 void systemCom::writeToConfig(){
-    qDebug() << m_firstBB->x() << m_firstBB->y() << m_firstBB->t()<< m_firstBB->listen() << m_firstBB->mac();
-    qDebug() << m_secondBB->x() << m_secondBB->y() << m_secondBB->t()<< m_secondBB->listen() << m_secondBB->mac();
-    QJsonObject twoBB;
+    QJsonObject config;
     QJsonObject blackBody1{ {"x",m_firstBB->x()}, {"y",m_firstBB->y()},
                             {"t",m_firstBB->t()}, {"listen",m_firstBB->listen()},
                             {"mac",m_firstBB->mac()} };
@@ -108,14 +140,18 @@ void systemCom::writeToConfig(){
     QJsonObject blackBody2{ {"x",m_secondBB->x()}, {"y",m_secondBB->y()},
                             {"t",m_secondBB->t()}, {"listen",m_secondBB->listen()},
                             {"mac",m_secondBB->mac()}};
-    twoBB["FirstBlackBody"] = blackBody1;
-    twoBB["SecondBlackBody"] = blackBody2;
+    QJsonObject wind {{"height", m_windHeight}, {"width", m_windWidth},
+                     {"fullscreen", m_fullscreen}};
+    config["FirstBlackBody"] = blackBody1;
+    config["SecondBlackBody"] = blackBody2;
+    config["window"] = wind;
+
     if (!QFile::exists(m_appPath+"/config.json")){
         createConfigFile();
     }
     QFile configFile(m_appPath+"/config.json");
     configFile.open(QIODevice::WriteOnly);
-    configFile.write(QJsonDocument(twoBB).toJson(QJsonDocument::Indented));
+    configFile.write(QJsonDocument(config).toJson(QJsonDocument::Indented));
     configFile.close();
 
 }

@@ -3,7 +3,7 @@ import QtQuick.Window 2.13
 import QtMultimedia 5.12
 import QtQuick.Controls 2.12
 
-Window {
+ApplicationWindow {
     id:root
     width: 850
     height: 495
@@ -17,9 +17,32 @@ Window {
     onVisibilityChanged:{
         if (visibility == 4){
             vpage.state = "fullscreen"
+            snapshot.fullscreen = true
         }
         if (visibility == 2){
             vpage.state = "default"
+            snapshot.fullscreen = false
+        }
+    }
+    onClosing: {
+        snapshot.writeToConfig()
+    }
+    onHeightChanged:snapshot.windHeight = height
+    onWidthChanged: snapshot.windWidth = width
+
+    Connections{
+        target:snapshot
+        onHasConfig:{
+            var jsonConfig = JSON.parse(config)
+            if (jsonConfig["window"]["fullscreen"])
+                root.showMaximized()
+            else{
+                if (Screen.desktopAvailableHeight > jsonConfig["window"]["height"])
+                    root.height = jsonConfig["window"]["height"]
+                if (Screen.desktopAvailableWidth > jsonConfig["window"]["width"])
+                    root.width = jsonConfig["window"]["width"]
+//                console.log(Screen.desktopAvailableHeight, Screen.desktopAvailableWidth)
+            }
         }
     }
     WindowForAdress{
@@ -57,10 +80,6 @@ Window {
         anchors.right:rightPanel.left
         color: "#595959"
     }
-
-//    function start(){
-//        vpage.startPlayer()
-//    }
 
     RightPanel{
         id:rightPanel
