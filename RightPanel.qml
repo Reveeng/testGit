@@ -78,6 +78,8 @@ Rectangle{
                 settingMode(false)
          }
          //tab with save frame button
+
+         //tab with settings
          Item{
              Button {
                  id: saveFrame
@@ -92,8 +94,21 @@ Rectangle{
                  }
              }
          }
-         //tab with settings
          Item{
+
+
+             Text{
+                 id:twoBB
+                 x: 548
+                 y: 0
+                text:"2 АЧТ"
+                color:"white"
+                font.pixelSize: 10
+                anchors.verticalCenter: chB.verticalCenter
+                anchors.right: chB.left
+                anchors.leftMargin: 3
+             }
+
              MouseArea{
                  x: 0
                  y: -27
@@ -112,8 +127,8 @@ Rectangle{
                  y: 54
                  index:1
                  indColor: "red"
-                 anchors.top: parent.top
-                 anchors.topMargin: 5
+                 anchors.top: chB.bottom
+                 anchors.topMargin:3
                  Component.onCompleted: setBlackBody.connect(setBlackBody1)
                  onTempChanged:temp == "" ? snapshot.firstBB.t = 0 : snapshot.firstBB.t = parseFloat(temp, 10)
                  onLstnChanged:{
@@ -128,6 +143,7 @@ Rectangle{
                 indColor: "green"
                 anchors.top: bb1.bottom
                 anchors.topMargin: 3
+                visible: false
                 index: 2
                 Component.onCompleted: setBlackBody.connect(setBlackBody2)
                 onTempChanged:temp == "" ? snapshot.secondBB.t = 0 : snapshot.secondBB.t = parseFloat(temp, 10)
@@ -142,28 +158,27 @@ Rectangle{
                 text:"Установить по опорным точкам"
                 anchors.left:parent.left
                 anchors.right: parent.right
-                anchors.top: bb2.bottom
+                anchors.top: bb1.bottom
                 anchors.margins: 5
                 height: 25
                 onClicked: {
                     var point1 = bb1.getRefPoint()
                     var point2 = bb2.getRefPoint()
                     setRefPointsSig(point1, point2)
-//                    snapshot.writeToConfig()
                 }
             }
-            Button{
-                id:startbtn
-                text: "Получить видео"
-                anchors.left:parent.left
-                anchors.right: parent.right
-                anchors.margins: 5
-                anchors.top: shutterCal.bottom
-                height:25
-                x:50
-                y:300
-                onClicked:rightPanel.start()
-            }
+//            Button{
+//                id:startbtn
+//                text: "Получить видео"
+//                anchors.left:parent.left
+//                anchors.right: parent.right
+//                anchors.margins: 5
+//                anchors.top: shutterCal.bottom
+//                height:25
+//                x:50
+//                y:300
+//                onClicked:rightPanel.start()
+//            }
              Button{
                 id:setAddres
                 anchors.left:parent.left
@@ -185,10 +200,54 @@ Rectangle{
                  anchors.margins: 5
                  height: 25
                  onClicked: {
-                    snapshot.shutterCalibr()
+                     snapshot.shutterCalibr()
                  }
              }
+             CheckBox {
+                 id: chB
+                 x: 20
+                 y: 0
+                 width: 15
+                 height: 15
+                 anchors.right:parent.right
+                 anchors.top: parent.top
+                 anchors.rightMargin: 17
+                 indicator.width:10
+                 indicator.height:10
+                 text: qsTr("Check Box")
+                 onCheckedChanged: {
+                    if (checkState == Qt.Checked)
+                    {
+                        bb2.visible = true
+                        setRefPoints.anchors.top = bb2.bottom
+                    }
+                    else{
+                        bb2.visible = false
+                        setRefPoints.anchors.top = bb1.bottom
+                    }
+                 }
+             }
+//             ScrollBar{
+//                 id: scroll
+//                 x: 198
+//                 y: 0
+//                 width: 10
+//                 visible: true
+//                 anchors.top:parent.top
+//                 anchors.right: parent.right
+//                 anchors.bottom: parent.bottom
+//                 orientation: Qt.Vertical
+//                 hoverEnabled: true
+//                 active: hovered || pressed
+//                 size: rightPanel.height/(shutterCal.y+shutterCal.height)
+//                 onPositionChanged: {
+//                     console.log(scroll.position)
+//                     chB.y = -scroll.position*rightPanel.height
+//                     twoBB.y = -scroll.position*rightPanel.height
+//                 }
+//              }
          }
+
      }
      TabBar{
          id:bar
@@ -212,3 +271,9 @@ Rectangle{
      }
 }
 
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

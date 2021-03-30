@@ -7,8 +7,8 @@ Rectangle{
     property int yBeforeExp:0
     property int heightBeforeExp:8
     property int widthBeforeExp:8
-    property double scaleFoctorX:1
-    property double scaleFoctorY:1
+    property double scaleFactorX:1
+    property double scaleFactorY:1
 
     property alias enableMovement:ma.enabled
 
@@ -49,8 +49,8 @@ Rectangle{
         widthBeforeExp = width
     }
     function scaleDots(h, w){
-       scaleFoctorX = 640/w
-       scaleFoctorY = 480/h
+       scaleFactorX = 640/w
+       scaleFactorY = 480/h
        x = Math.round(xBeforeExp*w/640)
        y = Math.round(yBeforeExp*h/480)
        height = Math.round(heightBeforeExp*h/480)

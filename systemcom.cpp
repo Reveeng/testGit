@@ -13,10 +13,10 @@ systemCom::systemCom(QString appPath, QObject *parent):QObject(parent),
     m_firstBB(new BlackBody(this)),
     m_secondBB(new BlackBody(this)),
     m_windHeight(480),
-    m_windWidth(640)
+    m_windWidth(640),
+    m_address("")
 {
     makeDir();
-    createDeviceFile();
     createConfigFile();
 }
 
@@ -62,6 +62,10 @@ bool systemCom::fullscreen() const{
     return m_fullscreen;
 }
 
+QString systemCom::address() const{
+    return m_address;
+}
+
 void systemCom::setWindHeight(int height){
     if (m_windHeight == height)
         return;
@@ -80,6 +84,11 @@ void systemCom::setFullscreen(bool fullscreen){
     m_fullscreen = fullscreen;
 }
 
+void systemCom::setAddress(QString address){
+    if (m_address == address)
+        return;
+    m_address = address;
+}
 
 
 void systemCom::makeDir(){
@@ -97,17 +106,6 @@ void systemCom::makeDir(){
     }
 }
 
-void systemCom::createDeviceFile(){
-    if (!QFile::exists(m_appPath+"/device.txt")){
-        QFile deviceFile(m_appPath+"/device.txt");
-        deviceFile.open(QIODevice::WriteOnly);
-        deviceFile.close();
-    }
-    else{
-        QTimer::singleShot(100,this,SLOT(checkAddress()));
-    }
-}
-
 void systemCom::createConfigFile(){
     if (!QFile::exists(m_appPath+"/config.json")){
         QFile configFile(m_appPath+"/config.json");
@@ -116,19 +114,7 @@ void systemCom::createConfigFile(){
     }
     QFile  configFile(m_appPath+"/config.json");
     if (configFile.size() != 0)
-        connect(this, &systemCom::hasAddress, this , &systemCom::checkConfig);
-}
-
-void systemCom::checkAddress(){
-    QFile deviceFile(m_appPath+"/device.txt");
-    deviceFile.open(QIODevice::ReadOnly);
-    QByteArray line;
-    while (!deviceFile.atEnd()){
-          line = deviceFile.readLine();
-    }
-    if (line.size() != 0){
-        emit hasAddress(QString::fromStdString(line.toStdString()));
-    }
+        QTimer::singleShot(100,this,SLOT(checkConfig()));
 }
 
 void systemCom::writeToConfig(){
@@ -142,9 +128,11 @@ void systemCom::writeToConfig(){
                             {"mac",m_secondBB->mac()}};
     QJsonObject wind {{"height", m_windHeight}, {"width", m_windWidth},
                      {"fullscreen", m_fullscreen}};
+    QJsonObject addr {{"address",m_address}};
     config["FirstBlackBody"] = blackBody1;
     config["SecondBlackBody"] = blackBody2;
     config["window"] = wind;
+    config["device"] = addr;
 
     if (!QFile::exists(m_appPath+"/config.json")){
         createConfigFile();
@@ -156,20 +144,11 @@ void systemCom::writeToConfig(){
 
 }
 
-void systemCom::checkConfig(QString address){
-    Q_UNUSED(address);
+void systemCom::checkConfig(){
     QFile configFile(m_appPath+"/config.json");
-    configFile.open(QIODevice::ReadOnly);
+    configFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QByteArray config;
     config = configFile.readAll();
     configFile.close();
     emit hasConfig(QString::fromStdString(config.toStdString()));
-}
-
-void systemCom::saveAddress(QString address){
-    QFile deviceFile(m_appPath+"/device.txt");
-    deviceFile.open(QIODevice::WriteOnly);
-    QTextStream stream(&deviceFile);
-    stream << address;
-    deviceFile.close();
 }

@@ -43,6 +43,7 @@ ApplicationWindow {
                     root.width = jsonConfig["window"]["width"]
 //                console.log(Screen.desktopAvailableHeight, Screen.desktopAvailableWidth)
             }
+            vpage.parseConfig(jsonConfig)
         }
     }
     WindowForAdress{

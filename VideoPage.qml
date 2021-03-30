@@ -43,23 +43,24 @@ Item{
         stateChanged.connect(stateProc)
     }
 
-    Connections{
-        target:snapshot
-        onHasAddress:{
-            setSource(address)
-        }
-        onHasConfig:{
-            var jsonConfig = JSON.parse(config)
-            bb1indicator.x = jsonConfig["FirstBlackBody"]["x"]
-            bb1indicator.xBeforeExp = jsonConfig["FirstBlackBody"]["x"]
-            bb1indicator.y = jsonConfig["FirstBlackBody"]["y"]
-            bb1indicator.yBeforeExp = jsonConfig["FirstBlackBody"]["y"]
-            bb2indicator.x = jsonConfig["SecondBlackBody"]["x"]
-            bb2indicator.xBeforeExp = jsonConfig["SecondBlackBody"]["x"]
-            bb2indicator.y = jsonConfig["SecondBlackBody"]["y"]
-            bb2indicator.yBeforeExp = jsonConfig["SecondBlackBody"]["y"]
-        }
-    }
+//    Connections{
+//        target:snapshot
+//        onHasConfig:{
+//            var jsonConfig = JSON.parse(config)
+//            bb1indicator.x = jsonConfig["FirstBlackBody"]["x"]
+//            bb1indicator.xBeforeExp = jsonConfig["FirstBlackBody"]["x"]
+//            bb1indicator.y = jsonConfig["FirstBlackBody"]["y"]
+//            bb1indicator.yBeforeExp = jsonConfig["FirstBlackBody"]["y"]
+//            bb2indicator.x = jsonConfig["SecondBlackBody"]["x"]
+//            bb2indicator.xBeforeExp = jsonConfig["SecondBlackBody"]["x"]
+//            bb2indicator.y = jsonConfig["SecondBlackBody"]["y"]
+//            bb2indicator.yBeforeExp = jsonConfig["SecondBlackBody"]["y"]
+//            if (jsonConfig["device"]["address"] != ""){
+//                console.log(jsonConfig["device"]["address"])
+//                setSource(jsonConfig["device"]["address"])
+//            }
+//        }
+//    }
 
      Rectangle{
         id:header
@@ -127,8 +128,8 @@ Item{
                 x: 243
                 y: 132
                 color: "red"
-                onXChanged: setCoords(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
-                onYChanged: setCoords(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),1)
+                onXChanged: setCoords(Math.round(x*scaleFactorX),Math.round(y*scaleFactorY),1)
+                onYChanged: setCoords(Math.round(x*scaleFactorX),Math.round(y*scaleFactorY),1)
                 visible: true
             }
             BlackBodyIndicator{
@@ -138,8 +139,8 @@ Item{
                 width: 8
                 height: 8
                 color: "green"
-                onXChanged: setCoords(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
-                onYChanged: setCoords(Math.round(x*scaleFoctorX),Math.round(y*scaleFoctorY),2)
+                onXChanged: setCoords(Math.round(x*scaleFactorX),Math.round(y*scaleFactorY),2)
+                onYChanged: setCoords(Math.round(x*scaleFactorX),Math.round(y*scaleFactorY),2)
                 visible: true
             }
 
@@ -246,14 +247,12 @@ Item{
      }
 
      function setSource(address){
-        snapshot.adress = address
+        snapshot.address = address
         snapshot.allBlackBodyAdress()
         myplayer.source = "rtspsrc location=rtsp://"+address+"/rawdata latency=0 ! "+
                           "rtpvrawdepay ! queue ! "+
                           "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
         myplayer.start()
-        snapshot.saveAddress(address)
-
      }
 
      function hideIndicators(mode){
@@ -272,6 +271,32 @@ Item{
              snapshot.secondBB.y = y
              bbChangedByMouse(x,y,2)
          }
+     }
+
+     function parseConfig(jsonConfig){
+         bb1indicator.x = jsonConfig["FirstBlackBody"]["x"]
+         bb1indicator.xBeforeExp = jsonConfig["FirstBlackBody"]["x"]
+         bb1indicator.y = jsonConfig["FirstBlackBody"]["y"]
+         bb1indicator.yBeforeExp = jsonConfig["FirstBlackBody"]["y"]
+         bb2indicator.x = jsonConfig["SecondBlackBody"]["x"]
+         bb2indicator.xBeforeExp = jsonConfig["SecondBlackBody"]["x"]
+         bb2indicator.y = jsonConfig["SecondBlackBody"]["y"]
+         bb2indicator.yBeforeExp = jsonConfig["SecondBlackBody"]["y"]
+         if (jsonConfig["device"]["address"] != ""){
+             console.log(jsonConfig["device"]["address"])
+             setSource(jsonConfig["device"]["address"])
+         }
+         setConfigToSnapshot(jsonConfig)
+     }
+     function setConfigToSnapshot(jsonConfig){
+        snapshot.firstBB.x = jsonConfig["FirstBlackBody"]["x"]
+        snapshot.firstBB.y = jsonConfig["FirstBlackBody"]["y"]
+        snapshot.secondBB.x = jsonConfig["SecondBlackBody"]["x"]
+        snapshot.secondBB.y = jsonConfig["SecondBlackBody"]["y"]
+        snapshot.windHeight = jsonConfig["window"]["height"]
+        snapshot.windWidth = jsonConfig["window"]["width"]
+        snapshot.fullscreen = jsonConfig["window"]["fullscreen"]
+        snapshot.address = jsonConfig["device"]["address"]
      }
 }
 

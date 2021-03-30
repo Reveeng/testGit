@@ -2,6 +2,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QRegularExpression>
+#include <QThread>
 
 onvif::onvif(QString appPath, QObject *parent): systemCom(appPath,parent),
     manager(new QNetworkAccessManager(this)),
@@ -11,16 +12,6 @@ onvif::onvif(QString appPath, QObject *parent): systemCom(appPath,parent),
 }
 
 onvif::~onvif(){
-}
-
-QString onvif::adress() const
-{
-    return m_adress;
-}
-
-void onvif::setAdress(QString adress)
-{
-    m_adress = adress;
 }
 
 bool onvif::timeoutCounter() const
@@ -70,8 +61,7 @@ void onvif::makeEnvelopeBegin(QString securityHeader){
 
 
 void onvif::sendRequest(QString servicePath,QString soapReqBody, QString cmd){
-//    QString securityHeader = "";
-    QString soapReq = /*makeEnvelopeBegin(securityHeader)*/ this->soap + soapReqBody + "</SOAP-ENV:Body></SOAP-ENV:Envelope>";
+    QString soapReq = this->soap + soapReqBody + "</SOAP-ENV:Body></SOAP-ENV:Envelope>";
     QNetworkRequest request;
     request.setUrl(QUrl(servicePath));
     request.setHeader(QNetworkRequest::ContentTypeHeader,"text/xml");
@@ -129,7 +119,7 @@ void onvif::sendRequest(QString servicePath,QString soapReqBody, QString cmd){
 void onvif::sendDeviceCommand(QString cmd){
     QString req = "<tds:SendAuxiliaryCommand><tds:AuxiliaryCommand>infrtst:DeviceCommand[";
     req+=cmd + "]</tds:AuxiliaryCommand></tds:SendAuxiliaryCommand>";
-    onvif::sendRequest("http://"+m_adress+"/onvif/device_service",req,cmd);
+    onvif::sendRequest("http://"+address()+"/onvif/device_service",req,cmd);
 }
 
 void onvif::synchronizeTime(QString comand, QDate date, int H,int M,int S){
@@ -168,7 +158,7 @@ void onvif::synchronizeTime(QString comand, QDate date, int H,int M,int S){
                 "</tt:Date>"
                 "</tds:UTCDateTime>"
                 "</tds:SetSystemDateAndTime>";
-    onvif::sendRequest("http://"+onvif::adress()+"/onvif/device_service",cmd,cmd);
+    onvif::sendRequest("http://"+address()+"/onvif/device_service",cmd,cmd);
 
 }
 

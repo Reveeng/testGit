@@ -56,13 +56,6 @@ private:
     QString m_mac;
 };
 
-//class windSizes: QObject {
-//    Q_OBJECT
-//    Q_PROPERTY(int height READ height WRITE setHeight)
-//    Q_PROPERTY(int width READ width WRITE setWidth)
-//    Q_PROPERTY(+)
-//};
-
 class systemCom:public QObject
 {
     Q_OBJECT
@@ -74,6 +67,7 @@ class systemCom:public QObject
     Q_PROPERTY(int windHeight READ windHeight WRITE setWindHeight)
     Q_PROPERTY(int windWidth READ windWidth WRITE setWindWidth)
     Q_PROPERTY(bool fullscreen READ fullscreen WRITE setFullscreen)
+    Q_PROPERTY(QString address READ address WRITE setAddress)
 public:
     explicit systemCom(QString appPath, QObject *parent = nullptr);
     ~systemCom();
@@ -87,12 +81,12 @@ public:
     int windWidth() const;
     bool fullscreen() const;
 
+    QString address() const;
+
 public slots:
     void setPathToSaveDir(QString pathTSD);
     void makeDir();
-    void checkAddress();
-    void checkConfig(QString address);
-    void saveAddress(QString address);
+    void checkConfig();
     void writeToConfig();
     void setWindHeight(int windHeight);
 
@@ -100,12 +94,12 @@ public slots:
 
     void setFullscreen(bool fullscreen);
 
+    void setAddress(QString address);
+
 private slots:
 
 private:
-    void createDeviceFile();
     void createConfigFile();
-
     QString m_appPath;
     QString m_pathToSaveDir;
     BlackBody *m_firstBB;
@@ -113,9 +107,9 @@ private:
     int m_windHeight;
     int m_windWidth;
     bool m_fullscreen;
+    QString m_address;
 
 signals:
-    void hasAddress(QString address);
     void hasConfig(QString config);
 };
 
