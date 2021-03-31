@@ -11,6 +11,7 @@ Rectangle{
      property alias textY1: bb1.textY
      property alias textX2: bb2.textX
      property alias textY2: bb2.textY
+     property alias maxT:mt.maxTemp
 
      //standart properties
      id:rightPanel
@@ -41,27 +42,6 @@ Rectangle{
          }
          onGetABBadress:{
               snapshot.aBBAdressWithDelay()
-         }
-         onHasConfig:{
-            var jsonConfig = JSON.parse(config)
-            bb1.textX = jsonConfig["FirstBlackBody"]["x"]
-            bb1.textY = jsonConfig["FirstBlackBody"]["y"]
-            bb1.temp = jsonConfig["FirstBlackBody"]["t"]
-            if (jsonConfig["FirstBlackBody"]["listen"])
-            {
-                bb1.lstn = true
-                var index1 = bb1.macCB.indexOfValue(jsonConfig["FirstBlackBody"]["mac"])
-                bb1.macCB.currentIndex = index1
-            }
-            bb2.textX = jsonConfig["SecondBlackBody"]["x"]
-            bb2.textY = jsonConfig["SecondBlackBody"]["y"]
-            bb2.temp = jsonConfig["SecondBlackBody"]["t"]
-            if (jsonConfig["SecondBlackBody"]["listen"])
-            {
-                bb2.lstn = true
-                var index2 = bb2.macCB.indexOfValue(jsonConfig["SecondBlackBody"]["mac"])
-                bb2.macCB.currentIndex = index2
-            }
          }
      }
      StackLayout{
@@ -153,12 +133,19 @@ Rectangle{
                 }
              }
 
+             MaxTemp{
+                id:mt
+                anchors.top: bb1.bottom
+                anchors.topMargin: 2
+
+             }
+
             Button{
                 id:setRefPoints
                 text:"Установить по опорным точкам"
                 anchors.left:parent.left
                 anchors.right: parent.right
-                anchors.top: bb1.bottom
+                anchors.top: mt.bottom
                 anchors.margins: 5
                 height: 25
                 onClicked: {
@@ -167,18 +154,7 @@ Rectangle{
                     setRefPointsSig(point1, point2)
                 }
             }
-//            Button{
-//                id:startbtn
-//                text: "Получить видео"
-//                anchors.left:parent.left
-//                anchors.right: parent.right
-//                anchors.margins: 5
-//                anchors.top: shutterCal.bottom
-//                height:25
-//                x:50
-//                y:300
-//                onClicked:rightPanel.start()
-//            }
+
              Button{
                 id:setAddres
                 anchors.left:parent.left
@@ -219,11 +195,11 @@ Rectangle{
                     if (checkState == Qt.Checked)
                     {
                         bb2.visible = true
-                        setRefPoints.anchors.top = bb2.bottom
+                        mt.anchors.top = bb2.bottom
                     }
                     else{
                         bb2.visible = false
-                        setRefPoints.anchors.top = bb1.bottom
+                        mt.anchors.top = bb1.bottom
                     }
                  }
              }
@@ -268,6 +244,28 @@ Rectangle{
                  color:parent.checked ? "#808080" : "#666666"
              }
          }
+     }
+
+     function parseConfig(jsonConfig){
+         bb1.textX = jsonConfig["FirstBlackBody"]["x"]
+         bb1.textY = jsonConfig["FirstBlackBody"]["y"]
+
+         if (jsonConfig["FirstBlackBody"]["listen"])
+         {
+             bb1.lstn = true
+             var index1 = bb1.macCB.indexOfValue(jsonConfig["FirstBlackBody"]["mac"])
+             bb1.macCB.currentIndex = index1
+         }
+         else bb1.temp = jsonConfig["FirstBlackBody"]["t"]
+         bb2.textX = jsonConfig["SecondBlackBody"]["x"]
+         bb2.textY = jsonConfig["SecondBlackBody"]["y"]
+         if (jsonConfig["SecondBlackBody"]["listen"])
+         {
+             bb2.lstn = true
+             var index2 = bb2.macCB.indexOfValue(jsonConfig["SecondBlackBody"]["mac"])
+             bb2.macCB.currentIndex = index2
+         }
+         else bb2.temp = jsonConfig["SecondBlackBody"]["t"]
      }
 }
 

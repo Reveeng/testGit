@@ -34,6 +34,8 @@ ApplicationWindow {
         target:snapshot
         onHasConfig:{
             var jsonConfig = JSON.parse(config)
+            snapshot.address = jsonConfig["device"]["address"]
+            snapshot.allBlackBodyAdress()
             if (jsonConfig["window"]["fullscreen"])
                 root.showMaximized()
             else{
@@ -44,6 +46,7 @@ ApplicationWindow {
 //                console.log(Screen.desktopAvailableHeight, Screen.desktopAvailableWidth)
             }
             vpage.parseConfig(jsonConfig)
+            rightPanel.parseConfig(jsonConfig)
         }
     }
     WindowForAdress{
@@ -71,6 +74,7 @@ ApplicationWindow {
                 rightPanel.textY2 = y
             }
         }
+        onMtChanged:rightPanel.maxT = maxTemp
     }
 
     Rectangle {

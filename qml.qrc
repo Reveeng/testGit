@@ -9,5 +9,6 @@
         <file>dotsright.png</file>
         <file>BBItem.qml</file>
         <file>WindowForAdress.qml</file>
+        <file>MaxTemp.qml</file>
     </qresource>
 </RCC>

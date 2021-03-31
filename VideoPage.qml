@@ -26,6 +26,7 @@ Item{
      signal bbChangedByMouse(int x, int y, int number)
      signal bbChangedByButton(int x, int y, int number)
      signal reconnect(var adress)
+     signal mtChanged(var maxTemp)
 
      //standart properties
      width:640
@@ -89,7 +90,8 @@ Item{
             id:refHot
         }
         temperature.stat.onMaxChanged: {
-            rectonscreen.maxT = Math.round(max*10)/10
+            rectonscreen.maxT = Math.round(max*100)/100
+            mtChanged(Math.round(max*100)/100)
         }
      }
 
@@ -112,7 +114,7 @@ Item{
          anchors.left:parent.left
          anchors.right: parent.right
          anchors.bottom: parent.bottom
-         filters: [fltDeconv,fltContrast, fltTemperature]
+         filters: [fltDeconv, fltTemperature,fltContrast]
          source: myplayer
          MouseArea{
             id:mouseArea
@@ -186,7 +188,7 @@ Item{
      //functions
 
      function setRefPoints(point1, point2){
-        console.log(point1, point2)
+        console.log(point1[2], point2[2])
         if (point1[2] < point2[2]){
             refCool.x = point1[0]
             refCool.y = point1[1]
@@ -203,6 +205,7 @@ Item{
             refHot.y = point1[1]
             refHot.t = point1[2]
         }
+        console.log(refCool.t, refHot.t)
      }
 
      function scaling(){
@@ -247,8 +250,6 @@ Item{
      }
 
      function setSource(address){
-        snapshot.address = address
-        snapshot.allBlackBodyAdress()
         myplayer.source = "rtspsrc location=rtsp://"+address+"/rawdata latency=0 ! "+
                           "rtpvrawdepay ! queue ! "+
                           "appsink max-buffers=3 drop=true emit-signals=true name=sink0";
